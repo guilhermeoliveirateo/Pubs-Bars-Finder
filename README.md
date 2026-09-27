@@ -1,6 +1,6 @@
-# 🍺 Pub Finder
+# 🍺 Pubs & Bars Finder
 
-Pub Finder is an Android app for discovering pubs and bars nearby, helping users find the best venues to gather and socialise. Users can save their favourite pubs, describe them, add photos and ratings, and see where they are on a map.
+Pubs & Bars Finder is an Android app for discovering pubs and bars nearby, helping users find the best venues to gather and socialise. Users can save their favourite pubs, describe them, add photos and ratings, and see where they are on a map.
 
 ## ✨ Features
 
