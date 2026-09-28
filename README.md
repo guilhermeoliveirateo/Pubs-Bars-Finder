@@ -46,7 +46,7 @@ The data layer is designed around a `PubStore` interface, implemented by an in-m
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/guilhermeoliveirateo/Pubs-Bars-Finder
    ```
 2. Open the project in Android Studio and let Gradle sync.
 3. Create or start an Android virtual device (Tools → Device Manager).
