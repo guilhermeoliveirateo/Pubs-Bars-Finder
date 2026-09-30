@@ -33,7 +33,7 @@ fun menu(): Int {
     println("4. Update a pub")
     println("5. Delete a pub")
     println("6. Exit")
-    print("Choose and option: ")
+    print("Choose an option: ")
     return readlnOrNull()?.toIntOrNull() ?: -1
 }
 
@@ -58,8 +58,12 @@ fun readCoordinate(label: String, min: Double, max: Double): Double {
     }
 }
 
-fun addPub() {
+fun readId(): Long? {
+    print("ID: ")
+    return readlnOrNull()?.trim()?.toLongOrNull()
+}
 
+fun addPub() {
     val title = readTitle()
     print("Description: ")
     val description = readlnOrNull()?.trim().orEmpty()
@@ -70,7 +74,7 @@ fun addPub() {
 
     val newPub = store.create(pub)
 
-    print("Pub added with ID ${newPub.id}.")
+    println("Pub added with ID ${newPub.id}.")
 }
 
 fun listPubs() {
@@ -85,15 +89,67 @@ fun listPubs() {
 }
 
 fun searchPub() {
+    val id = readId()
+    if (id == null) {
+        println("Invalid ID.")
+        return
+    }
 
+    val pub = store.findOne(id)
+
+    if (pub == null) {
+        println("Pub with ID $id not found.")
+        return
+    }
+
+    println("ID: ${pub.id} | Title: ${pub.title} | Description: ${pub.description} | Latitude: ${pub.latitude} | Longitude: ${pub.longitude}")
 }
 
 fun updatePub() {
+    listPubs()
+    if (store.findAll().isEmpty()) return
+    val id = readId()
+    if (id == null) {
+        println("Invalid ID.")
+        return
+    }
 
+    val pub = store.findOne(id)
+
+    if (pub == null) {
+        println("Pub with ID $id not found.")
+        return
+    }
+
+    val title = readTitle()
+    print("Description: ")
+    val description = readlnOrNull()?.trim().orEmpty()
+    val latitude = readCoordinate("Latitude", -90.0, 90.0)
+    val longitude = readCoordinate("Longitude", -180.0, 180.0)
+
+    val updatedPub = pub.copy(title = title, description = description, latitude = latitude, longitude = longitude)
+
+    if (store.update(updatedPub)) {
+        println("Pub with ID ${updatedPub.id} was successfully updated.")
+    } else {
+        println("Pub with ID ${updatedPub.id} could not be updated.")
+    }
 }
 
 fun deletePub() {
+    listPubs()
+    if (store.findAll().isEmpty()) return
+    val id = readId()
+    if (id == null) {
+        println("Invalid ID.")
+        return
+    }
 
+    if (store.delete(id)) {
+        println("Pub with ID $id was successfully deleted.")
+    } else {
+        println("Pub with ID $id not found.")
+    }
 }
 
 fun exit() {
