@@ -1,19 +1,20 @@
 <resources>
-    <string name="app_name">PubsBarsFinder</string>
+    <string name="app_name">Pubs Finder</string>
     <string name="placeholder_text">Pubs</string>
-    <string name="new_pub">New Pub</string>
-    <string name="edit_pub">Edit Pub</string>
-    <string name="about_pub">About the pub</string>
-    <string name="title">Title</string>
-    <string name="description">Description</string>
-    <string name="location_pub">Location</string>
-    <string name="latitude">Latitude</string>
-    <string name="longitude">Longitude</string>
-    <string name="latitude_longitude_instructions">Latitude between -90 and 90, longitude between -180 and 180.</string>
-    <string name="cancel">Cancel</string>
-    <string name="save_pub">Save pub</string>
-    <string name="save_changes">Save changes</string>
-    <string name="title_required">Title is required.</string>
-    <string name="latitude_range_error">Must be between -90 and 90.</string>
-    <string name="longitude_range_error">Must be between -180 and 180.</string>
+    <string name="screen_new_pub">New pub</string>
+    <string name="screen_edit_pub">Edit pub</string>
+    <string name="section_about">About the pub</string>
+    <string name="section_location">Location</string>
+    <string name="label_title">Title</string>
+    <string name="label_description">Description</string>
+    <string name="label_latitude">Latitude</string>
+    <string name="label_longitude">Longitude</string>
+    <string name="hint_coordinate_ranges">Latitude between -90 and 90, longitude between -180 and 180.</string>
+    <string name="button_cancel">Cancel</string>
+    <string name="button_add_pub">Add pub</string>
+    <string name="button_save_pub">Save pub</string>
+    <string name="button_save_changes">Save changes</string>
+    <string name="error_title_required">Title is required.</string>
+    <string name="error_latitude_range">Enter a number between -90 and 90.</string>
+    <string name="error_longitude_range">Enter a number between -180 and 180.</string>
 </resources>
