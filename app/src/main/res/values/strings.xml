@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Pubs Finder</string>
-    <string name="placeholder_text">Pubs</string>
     <string name="screen_new_pub">New pub</string>
     <string name="screen_edit_pub">Edit pub</string>
     <string name="section_about">About the pub</string>
@@ -10,6 +9,7 @@
     <string name="label_latitude">Latitude</string>
     <string name="label_longitude">Longitude</string>
     <string name="hint_coordinate_ranges">Latitude between -90 and 90, longitude between -180 and 180.</string>
+    <string name="empty_list_state_text">No pubs yet. Tap Add pub to save your first one.</string>
     <string name="button_cancel">Cancel</string>
     <string name="button_add_pub">Add pub</string>
     <string name="button_save_pub">Save pub</string>
@@ -17,4 +17,9 @@
     <string name="error_title_required">Title is required.</string>
     <string name="error_latitude_range">Enter a number between -90 and 90.</string>
     <string name="error_longitude_range">Enter a number between -180 and 180.</string>
+    <string name="format_coordinates">%1$.4f° %2$s, %3$.4f° %4$s</string>
+    <string name="direction_north">N</string>
+    <string name="direction_south">S</string>
+    <string name="direction_east">E</string>
+    <string name="direction_west">W</string>
 </resources>
