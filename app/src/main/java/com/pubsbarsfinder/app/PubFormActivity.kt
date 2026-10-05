@@ -33,9 +33,12 @@ class PubFormActivity : AppCompatActivity() {
 
         loadPub()
 
-        binding.cancelButton.setOnClickListener { finish() }
-        binding.saveButton.setOnClickListener { savePub() }
-
+        binding.cancelButton.setOnClickListener {
+            finish()
+        }
+        binding.saveButton.setOnClickListener {
+            savePub()
+        }
     }
 
     private fun loadPub() {
@@ -58,8 +61,8 @@ class PubFormActivity : AppCompatActivity() {
     private fun savePub() {
         val title = binding.titleInput.text.toString().trim()
         val description = binding.descriptionInput.text.toString().trim()
-        val latitude = binding.latitudeInput.text.toString().toDoubleOrNull()?.takeIf { it in -90.0..90.0 }
-        val longitude = binding.longitudeInput.text.toString().toDoubleOrNull()?.takeIf { it in -180.0..180.0 }
+        val latitude = binding.latitudeInput.text.toString().replace(',', '.').toDoubleOrNull()?.takeIf { it in -90.0..90.0 }
+        val longitude = binding.longitudeInput.text.toString().replace(',', '.').toDoubleOrNull()?.takeIf { it in -180.0..180.0 }
 
         showFieldError(input = binding.titleInput, label = binding.titleLabel, error = binding.titleError, hasError = title.isEmpty())
 
