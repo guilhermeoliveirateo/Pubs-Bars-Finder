@@ -11,9 +11,9 @@ import com.pubsbarsfinder.app.databinding.ItemPubBinding
 import com.pubsbarsfinder.app.models.PubModel
 import kotlin.math.abs
 
-class PubAdapter : ListAdapter<PubModel, PubAdapter.PubViewHolder>(PubDiffCallback) {
+class PubAdapter(private val listener: PubListener) : ListAdapter<PubModel, PubAdapter.PubViewHolder>(PubDiffCallback) {
 
-    class PubViewHolder(private val binding: ItemPubBinding) : RecyclerView.ViewHolder(binding.root) {
+    class PubViewHolder(private val binding: ItemPubBinding, private val listener: PubListener) : RecyclerView.ViewHolder(binding.root) {
         fun bind(pub: PubModel) {
             binding.titleText.text = pub.title
             binding.descriptionText.text = pub.description
@@ -28,12 +28,14 @@ class PubAdapter : ListAdapter<PubModel, PubAdapter.PubViewHolder>(PubDiffCallba
                 abs(pub.latitude), latitudeDirection,
                 abs(pub.longitude), longitudeDirection
             )
+
+            binding.root.setOnClickListener { listener.onPubClick(pub) }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PubViewHolder {
         val binding = ItemPubBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return PubViewHolder(binding)
+        return PubViewHolder(binding, listener)
     }
 
     override fun onBindViewHolder(holder: PubViewHolder, position: Int) {
