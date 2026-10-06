@@ -9,12 +9,14 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.pubsbarsfinder.app.adapters.PubAdapter
+import com.pubsbarsfinder.app.adapters.PubListener
 import com.pubsbarsfinder.app.databinding.ActivityMainBinding
+import com.pubsbarsfinder.app.models.PubModel
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), PubListener {
 
     private lateinit var binding: ActivityMainBinding
-    private val pubAdapter = PubAdapter()
+    private val pubAdapter = PubAdapter(this    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,5 +43,11 @@ class MainActivity : AppCompatActivity() {
         val pubs = PubData.store.findAll()
         pubAdapter.submitList(pubs)
         binding.emptyStateText.isVisible = pubs.isEmpty()
+    }
+
+    override fun onPubClick(pub: PubModel) {
+        val intent = Intent(this, PubFormActivity::class.java)
+        intent.putExtra(PubFormActivity.EXTRA_PUB_ID, pub.id)
+        startActivity(intent)
     }
 }
