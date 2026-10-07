@@ -2,6 +2,8 @@ package com.pubsbarsfinder.app
 
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
@@ -10,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.pubsbarsfinder.app.databinding.ActivityPubFormBinding
 import com.pubsbarsfinder.app.models.PubModel
 
@@ -98,5 +101,29 @@ class PubFormActivity : AppCompatActivity() {
     companion object {
         const val EXTRA_PUB_ID = "pub_id"
         private const val TAG = "PubFormActivity"
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        if (existingPub != null) {
+            menuInflater.inflate(R.menu.menu_pub_form, menu)
+        }
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val pub = existingPub
+        if (item.itemId == R.id.action_delete && pub != null) {
+            MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.dialog_delete_title)
+                .setMessage(getString(R.string.dialog_delete_message, pub.title))
+                .setNegativeButton(R.string.button_cancel, null)
+                .setPositiveButton(R.string.button_delete) { _, _ ->
+                    PubData.store.delete(pub.id)
+                    finish()
+                }
+                .show()
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 }

@@ -8,6 +8,10 @@
     <string name="label_description">Description</string>
     <string name="label_latitude">Latitude</string>
     <string name="label_longitude">Longitude</string>
+    <string name="hint_title_input">e.g. The Brazen Head</string>
+    <string name="hint_description_input">What makes this place worth a visit?</string>
+    <string name="hint_latitude_input">53.3448</string>
+    <string name="hint_longitude_input">-6.2765</string>
     <string name="hint_coordinate_ranges">Latitude between -90 and 90, longitude between -180 and 180.</string>
     <string name="empty_list_state_text">No pubs yet. Tap Add pub to save your first one.</string>
     <string name="button_cancel">Cancel</string>
@@ -17,6 +21,10 @@
     <string name="error_title_required">Title is required.</string>
     <string name="error_latitude_range">Enter a number between -90 and 90.</string>
     <string name="error_longitude_range">Enter a number between -180 and 180.</string>
+    <string name="action_delete">Delete pub</string>
+    <string name="dialog_delete_title">Delete pub?</string>
+    <string name="dialog_delete_message">%1$s will be permanently deleted.</string>
+    <string name="button_delete">Delete</string>
     <string name="format_coordinates">%1$.4f° %2$s, %3$.4f° %4$s</string>
     <string name="direction_north">N</string>
     <string name="direction_south">S</string>
