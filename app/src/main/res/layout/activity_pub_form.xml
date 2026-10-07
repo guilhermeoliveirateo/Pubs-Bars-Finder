@@ -47,6 +47,7 @@
                 android:inputType="textCapWords"
                 android:paddingHorizontal="14dp"
                 android:textColor="@color/text_primary"
+                android:hint="@string/hint_title_input"
                 android:textSize="16sp"/>
 
             <TextView
@@ -81,6 +82,7 @@
                 android:paddingHorizontal="14dp"
                 android:paddingVertical="14dp"
                 android:textColor="@color/text_primary"
+                android:hint="@string/hint_description_input"
                 android:textSize="16sp"/>
 
             <TextView
@@ -124,6 +126,7 @@
                         android:inputType="numberDecimal|numberSigned"
                         android:paddingHorizontal="14dp"
                         android:textColor="@color/text_primary"
+                        android:hint="@string/hint_latitude_input"
                         android:textSize="16sp"/>
 
                     <TextView
@@ -162,6 +165,7 @@
                         android:inputType="numberDecimal|numberSigned"
                         android:paddingHorizontal="14dp"
                         android:textColor="@color/text_primary"
+                        android:hint="@string/hint_longitude_input"
                         android:textSize="16sp"/>
 
                     <TextView
