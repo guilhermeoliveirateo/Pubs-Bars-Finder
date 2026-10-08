@@ -1,5 +1,6 @@
 package com.pubsbarsfinder.app
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -15,6 +16,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.pubsbarsfinder.app.databinding.ActivityPubFormBinding
 import com.pubsbarsfinder.app.models.PubModel
+import kotlin.math.abs
 
 class PubFormActivity : AppCompatActivity() {
 
@@ -111,19 +113,47 @@ class PubFormActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val pub = existingPub
-        if (item.itemId == R.id.action_delete && pub != null) {
-            MaterialAlertDialogBuilder(this)
-                .setTitle(R.string.dialog_delete_title)
-                .setMessage(getString(R.string.dialog_delete_message, pub.title))
-                .setNegativeButton(R.string.button_cancel, null)
-                .setPositiveButton(R.string.button_delete) { _, _ ->
-                    PubData.store.delete(pub.id)
-                    finish()
-                }
-                .show()
-            return true
+        val pub = existingPub ?: return super.onOptionsItemSelected(item)
+        return when (item.itemId) {
+            R.id.action_share -> {
+                sharePub(pub)
+                true
+            }
+            R.id.action_delete -> {
+                confirmDelete(pub)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
-        return super.onOptionsItemSelected(item)
+    }
+
+    private fun confirmDelete(pub: PubModel) {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.dialog_delete_title)
+            .setMessage(getString(R.string.dialog_delete_message, pub.title))
+            .setNegativeButton(R.string.button_cancel, null)
+            .setPositiveButton(R.string.button_delete) { _, _ ->
+                PubData.store.delete(pub.id)
+                finish()
+            }
+            .show()
+    }
+
+    private fun sharePub(pub: PubModel) {
+        val text = getString(R.string.format_share_text, pub.title, pub.description, formatCoordinates(pub), pub.latitude.toString(), pub.longitude.toString())
+        val intent = Intent(Intent.ACTION_SEND)
+        intent.type = "text/plain"
+        intent.putExtra(Intent.EXTRA_TEXT, text)
+        startActivity(Intent.createChooser(intent, getString(R.string.share_chooser_title)))
+    }
+
+    private fun formatCoordinates(pub: PubModel): String {
+        val latitudeDirection = getString(if (pub.latitude >= 0) R.string.direction_north else R.string.direction_south)
+        val longitudeDirection = getString(if (pub.longitude >= 0) R.string.direction_east else R.string.direction_west)
+        return getString(
+            R.string.format_coordinates,
+            abs(pub.latitude), latitudeDirection,
+            abs(pub.longitude), longitudeDirection
+        )
     }
 }

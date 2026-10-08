@@ -25,6 +25,9 @@
     <string name="dialog_delete_title">Delete pub?</string>
     <string name="dialog_delete_message">%1$s will be permanently deleted.</string>
     <string name="button_delete">Delete</string>
+    <string name="action_share">Share pub</string>
+    <string name="share_chooser_title">Share pub via</string>
+    <string name="format_share_text">%1$s\n%2$s\n%3$s\nhttps://maps.google.com/?q=%4$s,%5$s</string>
     <string name="format_coordinates">%1$.4f° %2$s, %3$.4f° %4$s</string>
     <string name="direction_north">N</string>
     <string name="direction_south">S</string>

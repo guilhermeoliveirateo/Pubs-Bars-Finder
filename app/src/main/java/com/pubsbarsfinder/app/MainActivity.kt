@@ -16,7 +16,7 @@ import com.pubsbarsfinder.app.models.PubModel
 class MainActivity : AppCompatActivity(), PubListener {
 
     private lateinit var binding: ActivityMainBinding
-    private val pubAdapter = PubAdapter(this    )
+    private val pubAdapter = PubAdapter(emptyList(), this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity(), PubListener {
     override fun onResume() {
         super.onResume()
         val pubs = PubData.store.findAll()
-        pubAdapter.submitList(pubs)
+        pubAdapter.updatePubs(pubs)
         binding.emptyStateText.isVisible = pubs.isEmpty()
     }
 
