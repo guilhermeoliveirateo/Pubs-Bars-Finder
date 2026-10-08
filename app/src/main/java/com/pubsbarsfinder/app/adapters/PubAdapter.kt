@@ -3,17 +3,22 @@ package com.pubsbarsfinder.app.adapters
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.pubsbarsfinder.app.R
 import com.pubsbarsfinder.app.databinding.ItemPubBinding
 import com.pubsbarsfinder.app.models.PubModel
 import kotlin.math.abs
 
-class PubAdapter(private val listener: PubListener) : ListAdapter<PubModel, PubAdapter.PubViewHolder>(PubDiffCallback) {
+class PubAdapter(
+    private var pubs: List<PubModel>,
+    private val listener: PubListener
+) : RecyclerView.Adapter<PubAdapter.PubViewHolder>() {
 
-    class PubViewHolder(private val binding: ItemPubBinding, private val listener: PubListener) : RecyclerView.ViewHolder(binding.root) {
+    class PubViewHolder(
+        private val binding: ItemPubBinding,
+        private val listener: PubListener
+    ) : RecyclerView.ViewHolder(binding.root) {
+
         fun bind(pub: PubModel) {
             binding.titleText.text = pub.title
             binding.descriptionText.text = pub.description
@@ -39,11 +44,13 @@ class PubAdapter(private val listener: PubListener) : ListAdapter<PubModel, PubA
     }
 
     override fun onBindViewHolder(holder: PubViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(pubs[position])
     }
 
-    private object PubDiffCallback : DiffUtil.ItemCallback<PubModel>() {
-        override fun areItemsTheSame(oldItem: PubModel, newItem: PubModel) = oldItem.id == newItem.id
-        override fun areContentsTheSame(oldItem: PubModel, newItem: PubModel) = oldItem == newItem
+    override fun getItemCount(): Int = pubs.size
+
+    fun updatePubs(newPubs: List<PubModel>) {
+        pubs = newPubs
+        notifyDataSetChanged()
     }
 }
