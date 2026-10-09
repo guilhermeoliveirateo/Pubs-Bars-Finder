@@ -10,26 +10,8 @@ data class PubModel(
     val description: String = "",
     val latitude: Double = 0.0,
     val longitude: Double = 0.0,
-    val venueType: VenueType = VenueType.PUB,
     val amenities: Set<Amenity> = emptySet(),
 )
-
-enum class VenueType {
-    PUB,
-    BAR,
-    SPORTS_BAR,
-    COCKTAIL_BAR,
-    CRAFT_BEER_BAR,
-}
-
-@StringRes
-fun VenueType.labelRes(): Int = when (this) {
-    VenueType.PUB -> R.string.venue_type_pub
-    VenueType.BAR -> R.string.venue_type_bar
-    VenueType.SPORTS_BAR -> R.string.venue_type_sports_bar
-    VenueType.COCKTAIL_BAR -> R.string.venue_type_cocktail_bar
-    VenueType.CRAFT_BEER_BAR -> R.string.venue_type_craft_beer_bar
-}
 enum class Amenity {
     LIVE_MUSIC,
     BEER_GARDEN,

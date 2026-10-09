@@ -9,7 +9,6 @@
     <string name="label_description">Description</string>
     <string name="label_latitude">Latitude</string>
     <string name="label_longitude">Longitude</string>
-    <string name="label_venue_type">Venue type</string>
     <string name="hint_title_input">e.g. The Brazen Head</string>
     <string name="hint_description_input">What makes this place worth a visit?</string>
     <string name="hint_latitude_input">53.3448</string>
@@ -30,11 +29,6 @@
     <string name="dialog_delete_message">%1$s will be permanently deleted.</string>
     <string name="share_chooser_title">Share pub via</string>
     <string name="format_share_text">%1$s\n%2$s\n%3$s\nhttps://maps.google.com/?q=%4$s,%5$s</string>
-    <string name="venue_type_pub">Pub</string>
-    <string name="venue_type_bar">Bar</string>
-    <string name="venue_type_sports_bar">Sports bar</string>
-    <string name="venue_type_craft_beer_bar">Craft beer bar</string>
-    <string name="venue_type_cocktail_bar">Cocktail bar</string>
     <string name="amenity_live_music">Live music</string>
     <string name="amenity_beer_garden">Beer garden</string>
     <string name="amenity_food_served">Food served</string>

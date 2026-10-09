@@ -73,7 +73,7 @@
             <EditText
                 android:id="@+id/descriptionInput"
                 android:layout_width="match_parent"
-                android:layout_height="112dp"
+                android:layout_height="88dp"
                 android:layout_marginTop="6dp"
                 android:background="@drawable/bg_field"
                 android:gravity="top|start"
@@ -89,6 +89,96 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="28dp"
+                android:text="@string/section_amenities"
+                android:textColor="@color/accent"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/amenityLiveMusic"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/amenity_live_music"
+                    android:textSize="15sp"
+                    android:textColor="@color/text_primary"
+                    android:buttonTint="@color/accent"/>
+
+                <CheckBox
+                    android:id="@+id/amenityWheelchairAccessible"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/amenity_wheelchair_accessible"
+                    android:textSize="15sp"
+                    android:textColor="@color/text_primary"
+                    android:buttonTint="@color/accent"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/amenitySportsOnTv"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/amenity_sports_on_tv"
+                    android:textSize="15sp"
+                    android:textColor="@color/text_primary"
+                    android:buttonTint="@color/accent"/>
+
+                <CheckBox
+                    android:id="@+id/amenityPetFriendly"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/amenity_pet_friendly"
+                    android:textSize="15sp"
+                    android:textColor="@color/text_primary"
+                    android:buttonTint="@color/accent"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/amenityBeerGarden"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/amenity_beer_garden"
+                    android:textSize="15sp"
+                    android:textColor="@color/text_primary"
+                    android:buttonTint="@color/accent"/>
+
+                <CheckBox
+                    android:id="@+id/amenityFoodServed"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/amenity_food_served"
+                    android:textSize="15sp"
+                    android:textColor="@color/text_primary"
+                    android:buttonTint="@color/accent"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
                 android:text="@string/section_location"
                 android:textColor="@color/accent"
                 android:textSize="14sp"
