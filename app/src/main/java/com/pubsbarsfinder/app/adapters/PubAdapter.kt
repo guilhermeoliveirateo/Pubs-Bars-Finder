@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.pubsbarsfinder.app.R
 import com.pubsbarsfinder.app.databinding.ItemPubBinding
 import com.pubsbarsfinder.app.models.PubModel
+import com.pubsbarsfinder.app.models.labelRes
 import kotlin.math.abs
 
 class PubAdapter(
@@ -23,6 +24,7 @@ class PubAdapter(
             binding.titleText.text = pub.title
             binding.descriptionText.text = pub.description
             binding.descriptionText.isVisible = pub.description.isNotEmpty()
+            binding.amenitiesText.isVisible = pub.amenities.isNotEmpty()
 
             val context = binding.root.context
             val latitudeDirection = context.getString(if (pub.latitude >= 0) R.string.direction_north else R.string.direction_south)
@@ -33,6 +35,10 @@ class PubAdapter(
                 abs(pub.latitude), latitudeDirection,
                 abs(pub.longitude), longitudeDirection
             )
+
+            binding.amenitiesText.text = pub.amenities.joinToString(
+                separator = context.getString(R.string.separator_amenities)
+            ) { context.getString(it.labelRes()) }
 
             binding.root.setOnClickListener { listener.onPubClick(pub) }
         }

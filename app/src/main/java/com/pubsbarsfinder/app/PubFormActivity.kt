@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
@@ -15,6 +16,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.pubsbarsfinder.app.databinding.ActivityPubFormBinding
+import com.pubsbarsfinder.app.models.Amenity
 import com.pubsbarsfinder.app.models.PubModel
 import kotlin.math.abs
 
@@ -22,6 +24,17 @@ class PubFormActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPubFormBinding
     private var existingPub: PubModel? = null
+
+    private val amenityCheckBoxes: Map<Amenity, CheckBox> by lazy {
+        mapOf(
+            Amenity.PET_FRIENDLY to binding.amenityPetFriendly,
+            Amenity.SPORTS_ON_TV to binding.amenitySportsOnTv,
+            Amenity.WHEELCHAIR_ACCESSIBLE to binding.amenityWheelchairAccessible,
+            Amenity.LIVE_MUSIC to binding.amenityLiveMusic,
+            Amenity.BEER_GARDEN to binding.amenityBeerGarden,
+            Amenity.FOOD_SERVED to binding.amenityFoodServed,
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,6 +69,11 @@ class PubFormActivity : AppCompatActivity() {
             binding.descriptionInput.setText(pub.description)
             binding.latitudeInput.setText(pub.latitude.toString())
             binding.longitudeInput.setText(pub.longitude.toString())
+            amenityCheckBoxes.forEach { (amenity, checkBox) ->
+                if (amenity in pub.amenities) {
+                    checkBox.isChecked = true
+                }
+            }
             title = getString(R.string.screen_edit_pub)
             binding.saveButton.setText(R.string.button_save_changes)
         } else {
@@ -68,6 +86,7 @@ class PubFormActivity : AppCompatActivity() {
         val description = binding.descriptionInput.text.toString().trim()
         val latitude = binding.latitudeInput.text.toString().replace(',', '.').toDoubleOrNull()?.takeIf { it in -90.0..90.0 }
         val longitude = binding.longitudeInput.text.toString().replace(',', '.').toDoubleOrNull()?.takeIf { it in -180.0..180.0 }
+        val amenities = amenityCheckBoxes.filterValues { it.isChecked }.keys
 
         showFieldError(input = binding.titleInput, label = binding.titleLabel, error = binding.titleError, hasError = title.isEmpty())
 
@@ -79,10 +98,10 @@ class PubFormActivity : AppCompatActivity() {
 
         val pub = existingPub
         if (pub == null) {
-            val newPub = PubData.store.create(PubModel(title = title, description = description, latitude = latitude, longitude = longitude))
+            val newPub = PubData.store.create(PubModel(title = title, description = description, latitude = latitude, longitude = longitude, amenities = amenities))
             Log.i(TAG, "Create new pub: $newPub")
         } else {
-            val updatedPub = pub.copy(title = title, description = description, latitude = latitude, longitude = longitude)
+            val updatedPub = pub.copy(title = title, description = description, latitude = latitude, longitude = longitude, amenities = amenities)
             PubData.store.update(updatedPub)
             Log.i(TAG, "Updated pub: $updatedPub")
         }
@@ -140,7 +159,7 @@ class PubFormActivity : AppCompatActivity() {
     }
 
     private fun sharePub(pub: PubModel) {
-        val text = getString(R.string.format_share_text, pub.title, pub.description, formatCoordinates(pub), pub.latitude.toString(), pub.longitude.toString())
+        val text = getString(R.string.format_share_text, pub.title, pub.description, formatCoordinates(pub), formatAmenities(pub.amenities), pub.latitude.toString(), pub.longitude.toString())
         val intent = Intent(Intent.ACTION_SEND)
         intent.type = "text/plain"
         intent.putExtra(Intent.EXTRA_TEXT, text)
@@ -155,5 +174,12 @@ class PubFormActivity : AppCompatActivity() {
             abs(pub.latitude), latitudeDirection,
             abs(pub.longitude), longitudeDirection
         )
+    }
+
+    fun formatAmenities(amenities: Set<Amenity>): String {
+        if (amenities.isEmpty()) return "none"
+        return amenities.joinToString(" . ") { amenity ->
+            amenity.name.lowercase().replace('_', ' ').replaceFirstChar { it.uppercase() }
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.pubsbarsfinder.app.main
 
+import com.pubsbarsfinder.app.models.Amenity
 import com.pubsbarsfinder.app.models.PubMemStore
 import com.pubsbarsfinder.app.models.PubModel
 import com.pubsbarsfinder.app.models.PubStore
@@ -83,7 +84,7 @@ fun listPubs() {
         println("No pubs found.")
     } else {
         pubs.forEach {
-            println("ID: ${it.id} | Title: ${it.title} | Description: ${it.description} | Latitude: ${it.latitude} | Longitude: ${it.longitude}")
+            println("ID: ${it.id} | Title: ${it.title} | Description: ${it.description} | Latitude: ${it.latitude} | Longitude: ${it.longitude} | Amenities: ${formatAmenities(it.amenities)}")
         }
     }
 }
@@ -102,7 +103,7 @@ fun searchPub() {
         return
     }
 
-    println("ID: ${pub.id} | Title: ${pub.title} | Description: ${pub.description} | Latitude: ${pub.latitude} | Longitude: ${pub.longitude}")
+    println("ID: ${pub.id} | Title: ${pub.title} | Description: ${pub.description} | Latitude: ${pub.latitude} | Longitude: ${pub.longitude} | Amenities: ${formatAmenities(pub.amenities)}")
 }
 
 fun updatePub() {
@@ -154,4 +155,11 @@ fun deletePub() {
 
 fun exit() {
     println("Goodbye!!")
+}
+
+fun formatAmenities(amenities: Set<Amenity>): String {
+    if (amenities.isEmpty()) return "none"
+    return amenities.joinToString(", ") { amenity ->
+        amenity.name.lowercase().replace('_', ' ').replaceFirstChar { it.uppercase() }
+    }
 }
