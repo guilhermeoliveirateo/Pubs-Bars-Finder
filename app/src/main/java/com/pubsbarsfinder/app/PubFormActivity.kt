@@ -17,6 +17,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.pubsbarsfinder.app.databinding.ActivityPubFormBinding
 import com.pubsbarsfinder.app.models.Amenity
+import com.pubsbarsfinder.app.models.labelRes
 import com.pubsbarsfinder.app.models.PubModel
 import kotlin.math.abs
 
@@ -159,7 +160,14 @@ class PubFormActivity : AppCompatActivity() {
     }
 
     private fun sharePub(pub: PubModel) {
-        val text = getString(R.string.format_share_text, pub.title, pub.description, formatCoordinates(pub), formatAmenities(pub.amenities), pub.latitude.toString(), pub.longitude.toString())
+        val text = listOf(
+            pub.title,
+            pub.description,
+            formatCoordinates(pub),
+            pub.amenities.joinToString(getString(R.string.separator_amenities)) { getString(it.labelRes()) },
+            getString(R.string.format_map_link, pub.latitude.toString(), pub.longitude.toString())
+        ).filter { it.isNotEmpty() }.joinToString("\n")
+
         val intent = Intent(Intent.ACTION_SEND)
         intent.type = "text/plain"
         intent.putExtra(Intent.EXTRA_TEXT, text)
@@ -174,12 +182,5 @@ class PubFormActivity : AppCompatActivity() {
             abs(pub.latitude), latitudeDirection,
             abs(pub.longitude), longitudeDirection
         )
-    }
-
-    fun formatAmenities(amenities: Set<Amenity>): String {
-        if (amenities.isEmpty()) return "none"
-        return amenities.joinToString(" . ") { amenity ->
-            amenity.name.lowercase().replace('_', ' ').replaceFirstChar { it.uppercase() }
-        }
     }
 }
