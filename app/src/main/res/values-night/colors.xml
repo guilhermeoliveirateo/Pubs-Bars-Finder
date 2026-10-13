@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="accent">#D9A15C</color>
+    <color name="on_accent">#1F1A17</color>
+
+    <color name="screen_background">#1A1614</color>
+    <color name="divider">#3A332E</color>
+    <color name="field_border">#A2958C</color>
+
+    <color name="text_primary">#F3EDE8</color>
+    <color name="text_label">#D6CCC4</color>
+    <color name="text_secondary">#B8ABA2</color>
+
+    <color name="error">#F2B8B5</color>
+</resources>
