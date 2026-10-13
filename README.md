@@ -5,9 +5,11 @@ Pubs & Bars Finder is an Android app for discovering pubs and bars, helping user
 ## ✨ Features
 
 - Add a pub with a title, description, amenities and coordinates
-- Input validation: a title is required, and coordinates must be within valid ranges (a comma is accepted as the decimal separator)
+- Input validation: a title is required, and coordinates must be within valid ranges (a comma is accepted as the decimal separator). After a first save attempt, errors update as each field is corrected
 - List all saved pubs as cards, showing the description, formatted coordinates (for example 53.3448° N, 6.2765° W) and amenities
-- Empty-state message when no pubs have been saved yet
+- Search pubs by title as you type, ignoring upper and lower case
+- Light and dark mode support, following the phone's theme
+- Empty-state messages when no pubs have been saved yet, or when no pubs match the search
 - Tap a pub to open it for editing
 - Delete a pub from the edit screen, with a confirmation dialog
 - Share a pub through any app (messaging, email and so on), including a Google Maps link to its location
@@ -26,7 +28,7 @@ Pubs & Bars Finder is an Android app for discovering pubs and bars, helping user
 
 ```
 app/src/main/java/com/pubsbarsfinder/app/
-├── MainActivity.kt        # Main screen: list of pubs
+├── MainActivity.kt        # Main screen: list of pubs and search
 ├── PubFormActivity.kt     # Add/edit screen: form, delete and share
 ├── PubData.kt             # Shared pub store used by all screens
 ├── adapters/
@@ -44,6 +46,7 @@ app/src/main/res/
 ├── menu/                  # Action bar menu
 ├── drawable/              # Field and card backgrounds, icons
 └── values/                # Strings, colours and themes
+└── values-night/          # Colours for dark mode
 
 docs/                      # Project documentation
 ```
@@ -54,6 +57,8 @@ docs/                      # Project documentation
 - **Immutable model:** `PubModel` is a data class with read-only properties. Changes create updated copies with `copy()`, and every change goes through the store.
 - **Shared store:** a single `PubData` object holds the store, so all screens work with the same data.
 - **List interactions:** the adapter reports taps through the `PubListener` interface, implemented by the main screen, which keeps the adapter independent of other screens.
+- **Search:** the main screen refreshes the list through a single `showPubs()` function, which applies the current search text, so the search stays active after adding or editing a pub.
+- **Dark mode:** colours are named by their role (such as `text_primary` or `accent`), with a second set of values in `res/values-night/colors.xml`. Android picks the right set automatically, so no layout or code needs to know which mode is active.
 - **Resources:** all user-visible text is defined in `strings.xml`, and colours are named by their role in `colors.xml`.
 
 ![UML class diagram](docs/uml-class-diagram.png)

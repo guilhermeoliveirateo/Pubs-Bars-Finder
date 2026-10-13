@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.widget.doAfterTextChanged
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.pubsbarsfinder.app.databinding.ActivityPubFormBinding
 import com.pubsbarsfinder.app.models.Amenity
@@ -25,6 +26,8 @@ class PubFormActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPubFormBinding
     private var existingPub: PubModel? = null
+
+    private var hasTriedToSave = false
 
     private val amenityCheckBoxes: Map<Amenity, CheckBox> by lazy {
         mapOf(
@@ -58,6 +61,22 @@ class PubFormActivity : AppCompatActivity() {
         binding.saveButton.setOnClickListener {
             savePub()
         }
+
+        binding.titleInput.doAfterTextChanged {
+            if (hasTriedToSave) {
+                showFieldError(binding.titleInput, binding.titleLabel, binding.titleError, hasError = readTitle().isEmpty())
+            }
+        }
+        binding.latitudeInput.doAfterTextChanged {
+            if (hasTriedToSave) {
+                showFieldError(binding.latitudeInput, binding.latitudeLabel, binding.latitudeError, hasError = readLatitude() == null)
+            }
+        }
+        binding.longitudeInput.doAfterTextChanged {
+            if (hasTriedToSave) {
+                showFieldError(binding.longitudeInput, binding.longitudeLabel, binding.longitudeError, hasError = readLongitude() == null)
+            }
+        }
     }
 
     private fun loadPub() {
@@ -83,10 +102,12 @@ class PubFormActivity : AppCompatActivity() {
     }
 
     private fun savePub() {
-        val title = binding.titleInput.text.toString().trim()
+        hasTriedToSave = true
+
+        val title = readTitle()
         val description = binding.descriptionInput.text.toString().trim()
-        val latitude = binding.latitudeInput.text.toString().replace(',', '.').toDoubleOrNull()?.takeIf { it in -90.0..90.0 }
-        val longitude = binding.longitudeInput.text.toString().replace(',', '.').toDoubleOrNull()?.takeIf { it in -180.0..180.0 }
+        val latitude = readLatitude()
+        val longitude = readLongitude()
         val amenities = amenityCheckBoxes.filterValues { it.isChecked }.keys
 
         showFieldError(input = binding.titleInput, label = binding.titleLabel, error = binding.titleError, hasError = title.isEmpty())
@@ -114,6 +135,15 @@ class PubFormActivity : AppCompatActivity() {
         input.setBackgroundResource(if (hasError) R.drawable.bg_field_error else R.drawable.bg_field)
         label.setTextColor(ContextCompat.getColor(this, if (hasError) R.color.error else R.color.text_label))
     }
+
+    private fun readTitle(): String =
+        binding.titleInput.text.toString().trim()
+
+    private fun readLatitude(): Double? =
+        binding.latitudeInput.text.toString().replace(',', '.').toDoubleOrNull()?.takeIf { it in -90.0..90.0 }
+
+    private fun readLongitude(): Double? =
+        binding.longitudeInput.text.toString().replace(',', '.').toDoubleOrNull()?.takeIf { it in -180.0..180.0 }
 
     override fun onSupportNavigateUp(): Boolean {
         finish()
