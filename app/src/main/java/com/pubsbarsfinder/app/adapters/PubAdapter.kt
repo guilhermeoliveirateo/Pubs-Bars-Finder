@@ -23,6 +23,11 @@ class PubAdapter(
         fun bind(pub: PubModel) {
             binding.titleText.text = pub.title
             binding.descriptionText.text = pub.description
+            binding.descriptionText.text = pub.description
+                .lines()
+                .map { it.trim() }
+                .filter { it.isNotEmpty() }
+                .joinToString(" ")
             binding.descriptionText.isVisible = pub.description.isNotEmpty()
             binding.amenitiesText.isVisible = pub.amenities.isNotEmpty()
 
@@ -56,7 +61,15 @@ class PubAdapter(
     override fun getItemCount(): Int = pubs.size
 
     fun updatePubs(newPubs: List<PubModel>) {
+        val oldSize = pubs.size
         pubs = newPubs
-        notifyDataSetChanged()
+        val newSize = pubs.size
+
+        notifyItemRangeChanged(0, minOf(oldSize, newSize))
+        if (newSize > oldSize) {
+            notifyItemRangeInserted(oldSize, newSize - oldSize)
+        } else if (newSize < oldSize) {
+            notifyItemRangeRemoved(newSize, oldSize - newSize)
+        }
     }
 }

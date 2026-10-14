@@ -205,8 +205,16 @@ class PubFormActivity : AppCompatActivity() {
     }
 
     private fun formatCoordinates(pub: PubModel): String {
-        val latitudeDirection = getString(if (pub.latitude >= 0) R.string.direction_north else R.string.direction_south)
-        val longitudeDirection = getString(if (pub.longitude >= 0) R.string.direction_east else R.string.direction_west)
+        val latitudeDirection = getString(if (pub.latitude >= 0) {
+            R.string.direction_north
+        } else {
+            R.string.direction_south
+        })
+        val longitudeDirection = getString(if (pub.longitude >= 0) {
+            R.string.direction_east
+        } else {
+            R.string.direction_west
+        })
         return getString(
             R.string.format_coordinates,
             abs(pub.latitude), latitudeDirection,
