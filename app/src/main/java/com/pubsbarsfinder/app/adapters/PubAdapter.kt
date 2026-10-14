@@ -23,6 +23,11 @@ class PubAdapter(
         fun bind(pub: PubModel) {
             binding.titleText.text = pub.title
             binding.descriptionText.text = pub.description
+            binding.descriptionText.text = pub.description
+                .lines()
+                .map { it.trim() }
+                .filter { it.isNotEmpty() }
+                .joinToString(" ")
             binding.descriptionText.isVisible = pub.description.isNotEmpty()
             binding.amenitiesText.isVisible = pub.amenities.isNotEmpty()
 
