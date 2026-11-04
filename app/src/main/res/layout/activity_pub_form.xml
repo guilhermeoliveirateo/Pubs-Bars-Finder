@@ -19,13 +19,30 @@
             android:paddingHorizontal="20dp"
             android:paddingVertical="16dp">
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/section_about"
-                android:textColor="@color/accent"
-                android:textSize="14sp"
-                android:textStyle="bold"/>
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/section_about"
+                    android:textColor="@color/accent"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <CheckBox
+                    android:id="@+id/favouriteCheckBox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:button="@drawable/selector_favourite"
+                    android:buttonTint="@color/accent"
+                    android:contentDescription="@string/label_favourite" />
+
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/titleLabel"

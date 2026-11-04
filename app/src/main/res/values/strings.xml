@@ -9,6 +9,7 @@
     <string name="label_description">Description</string>
     <string name="label_latitude">Latitude</string>
     <string name="label_longitude">Longitude</string>
+    <string name="label_favourite">Favourite</string>
     <string name="hint_title_input">e.g. The Brazen Head</string>
     <string name="hint_search_pubs">Search pubs by title</string>
     <string name="hint_description_input">What makes this place worth a visit?</string>
@@ -27,6 +28,8 @@
     <string name="error_longitude_range">Enter a number between -180 and 180.</string>
     <string name="action_delete">Delete pub</string>
     <string name="action_share">Share pub</string>
+    <string name="action_add_favourites">Add to favourites</string>
+    <string name="action_remove_favourites">Remove from favourites</string>
     <string name="dialog_delete_title">Delete pub?</string>
     <string name="dialog_delete_message">%1$s will be permanently deleted.</string>
     <string name="share_chooser_title">Share pub via</string>
