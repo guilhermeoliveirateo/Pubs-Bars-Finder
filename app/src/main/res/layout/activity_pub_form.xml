@@ -32,15 +32,18 @@
                     android:text="@string/section_about"
                     android:textColor="@color/accent"
                     android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"/>
 
                 <CheckBox
                     android:id="@+id/favouriteCheckBox"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:minHeight="0dp"
+                    android:minWidth="0dp"
                     android:button="@drawable/selector_favourite"
-                    android:buttonTint="@color/accent"
-                    android:contentDescription="@string/label_favourite" />
+                    android:contentDescription="@string/label_favourite"
+                    app:buttonTint="@color/accent"
+                    app:useMaterialThemeColors="false" />
 
             </LinearLayout>
 
@@ -48,7 +51,7 @@
                 android:id="@+id/titleLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="14dp"
                 android:labelFor="@id/titleInput"
                 android:text="@string/label_title"
                 android:textColor="@color/text_label"
@@ -121,6 +124,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:layout_marginTop="8dp"
                     android:text="@string/amenity_live_music"
                     android:textSize="15sp"
                     android:textColor="@color/text_primary"
@@ -131,6 +135,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:layout_marginTop="8dp"
                     android:text="@string/amenity_wheelchair_accessible"
                     android:textSize="15sp"
                     android:textColor="@color/text_primary"
