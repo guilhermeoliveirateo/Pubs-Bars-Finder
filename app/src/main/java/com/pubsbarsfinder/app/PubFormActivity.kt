@@ -89,6 +89,7 @@ class PubFormActivity : AppCompatActivity() {
             binding.descriptionInput.setText(pub.description)
             binding.latitudeInput.setText(pub.latitude.toString())
             binding.longitudeInput.setText(pub.longitude.toString())
+            binding.favouriteCheckBox.isChecked = pub.isFavourite
             amenityCheckBoxes.forEach { (amenity, checkBox) ->
                 if (amenity in pub.amenities) {
                     checkBox.isChecked = true
@@ -109,6 +110,7 @@ class PubFormActivity : AppCompatActivity() {
         val latitude = readLatitude()
         val longitude = readLongitude()
         val amenities = amenityCheckBoxes.filterValues { it.isChecked }.keys
+        val isFavourite = binding.favouriteCheckBox.isChecked
 
         showFieldError(input = binding.titleInput, label = binding.titleLabel, error = binding.titleError, hasError = title.isEmpty())
 
@@ -120,10 +122,10 @@ class PubFormActivity : AppCompatActivity() {
 
         val pub = existingPub
         if (pub == null) {
-            val newPub = PubData.store.create(PubModel(title = title, description = description, latitude = latitude, longitude = longitude, amenities = amenities))
+            val newPub = PubData.store.create(PubModel(title = title, description = description, latitude = latitude, longitude = longitude, amenities = amenities, isFavourite = isFavourite))
             Log.i(TAG, "Create new pub: $newPub")
         } else {
-            val updatedPub = pub.copy(title = title, description = description, latitude = latitude, longitude = longitude, amenities = amenities)
+            val updatedPub = pub.copy(title = title, description = description, latitude = latitude, longitude = longitude, amenities = amenities, isFavourite = isFavourite)
             PubData.store.update(updatedPub)
             Log.i(TAG, "Updated pub: $updatedPub")
         }
