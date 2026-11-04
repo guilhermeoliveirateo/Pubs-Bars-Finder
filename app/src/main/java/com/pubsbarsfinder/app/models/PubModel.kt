@@ -11,6 +11,7 @@ data class PubModel(
     val latitude: Double = 0.0,
     val longitude: Double = 0.0,
     val amenities: Set<Amenity> = emptySet(),
+    val isFavourite: Boolean = false,
 )
 enum class Amenity {
     LIVE_MUSIC,
