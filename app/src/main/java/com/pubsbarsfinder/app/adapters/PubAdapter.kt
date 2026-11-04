@@ -46,6 +46,13 @@ class PubAdapter(
             ) { context.getString(it.labelRes()) }
 
             binding.root.setOnClickListener { listener.onPubClick(pub) }
+
+            val favouriteIcon = if (pub.isFavourite) R.drawable.ic_favourite else R.drawable.ic_favourite_border
+            val favouriteDescription = if (pub.isFavourite) R.string.content_description_remove_favourite else R.string.content_description_add_favourite
+
+            binding.favouriteButton.setImageResource(favouriteIcon)
+            binding.favouriteButton.contentDescription = context.getString(favouriteDescription)
+            binding.favouriteButton.setOnClickListener { listener.onFavouriteClick(pub) }
         }
     }
 

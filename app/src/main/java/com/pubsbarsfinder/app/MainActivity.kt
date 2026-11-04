@@ -54,6 +54,11 @@ class MainActivity : AppCompatActivity(), PubListener {
         startActivity(intent)
     }
 
+    override fun onFavouriteClick(pub: PubModel) {
+        PubData.store.update(pub.copy(isFavourite = !pub.isFavourite))
+        showPubs()
+    }
+
     private fun showPubs() {
         val query = binding.searchInput.text.toString().trim()
         val allPubs = PubData.store.findAll()

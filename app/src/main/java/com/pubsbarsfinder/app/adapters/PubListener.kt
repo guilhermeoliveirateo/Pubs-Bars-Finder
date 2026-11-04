@@ -4,4 +4,5 @@ import com.pubsbarsfinder.app.models.PubModel
 
 interface PubListener {
     fun onPubClick(pub: PubModel)
+    fun onFavouriteClick(pub: PubModel)
 }
