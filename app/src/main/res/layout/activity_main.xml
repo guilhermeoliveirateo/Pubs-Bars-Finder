@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:background="@color/screen_background"
     android:layout_width="match_parent"
@@ -24,6 +25,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+    <TextView
+        android:id="@+id/activeFiltersText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textColor="@color/text_secondary"
+        android:textSize="13sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/searchInput"
+        app:layout_constraintStart_toStartOf="@id/searchInput"
+        app:layout_constraintTop_toBottomOf="@id/searchInput"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/pubList"
         android:layout_width="0dp"
@@ -34,7 +47,7 @@
         app:layout_constraintBottom_toTopOf="@id/addPubButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/searchInput"/>
+        app:layout_constraintTop_toBottomOf="@id/activeFiltersText"/>
 
     <TextView
         android:id="@+id/emptyStateText"
