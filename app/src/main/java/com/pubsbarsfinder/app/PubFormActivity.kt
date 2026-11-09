@@ -265,6 +265,10 @@ class PubFormActivity : AppCompatActivity() {
             binding.photoPreview.scaleType = ImageView.ScaleType.CENTER
             binding.choosePhotoButton.setText(R.string.button_choose_photo)
         }
+        if (binding.photoPreview.drawable == null) {
+            binding.photoPreview.setImageResource(R.drawable.ic_photo_placeholder)
+            binding.photoPreview.scaleType = ImageView.ScaleType.CENTER
+        }
         binding.removePhotoButton.isVisible = uri != null
     }
 }

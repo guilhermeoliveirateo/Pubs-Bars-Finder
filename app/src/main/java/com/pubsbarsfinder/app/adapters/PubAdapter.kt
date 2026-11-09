@@ -2,6 +2,7 @@ package com.pubsbarsfinder.app.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.pubsbarsfinder.app.R
@@ -22,7 +23,6 @@ class PubAdapter(
 
         fun bind(pub: PubModel) {
             binding.titleText.text = pub.title
-            binding.descriptionText.text = pub.description
             binding.descriptionText.text = pub.description
                 .lines()
                 .map { it.trim() }
@@ -53,6 +53,14 @@ class PubAdapter(
             binding.favouriteButton.setImageResource(favouriteIcon)
             binding.favouriteButton.contentDescription = context.getString(favouriteDescription)
             binding.favouriteButton.setOnClickListener { listener.onFavouriteClick(pub) }
+
+            val imageUri = pub.imageUri
+            if (imageUri != null) {
+                binding.photoImage.setImageURI(imageUri.toUri())
+            } else {
+                binding.photoImage.setImageDrawable(null)
+            }
+            binding.photoImage.isVisible = binding.photoImage.drawable != null
         }
     }
 
