@@ -5,6 +5,7 @@
     <string name="section_about">About the pub</string>
     <string name="section_location">Location</string>
     <string name="section_amenities">Amenities</string>
+    <string name="section_photo">Photo</string>
     <string name="label_title">Title</string>
     <string name="label_description">Description</string>
     <string name="label_latitude">Latitude</string>
@@ -12,6 +13,7 @@
     <string name="label_favourite">Favourite</string>
     <string name="content_description_add_favourite">Add to favourites</string>
     <string name="content_description_remove_favourite">Remove from favourites</string>
+    <string name="content_description_photo">Pub photo</string>
     <string name="filter_favourites_only">Favourites only</string>
     <string name="hint_title_input">e.g. The Brazen Head</string>
     <string name="hint_search_pubs">Search pubs by title</string>
@@ -28,6 +30,9 @@
     <string name="button_delete">Delete</string>
     <string name="button_apply">Apply</string>
     <string name="button_clear">Clear</string>
+    <string name="button_choose_photo">Choose photo</string>
+    <string name="button_change_photo">Change photo</string>
+    <string name="button_remove_photo">Remove photo</string>
     <string name="error_title_required">Title is required.</string>
     <string name="error_latitude_range">Enter a number between -90 and 90.</string>
     <string name="error_longitude_range">Enter a number between -180 and 180.</string>
