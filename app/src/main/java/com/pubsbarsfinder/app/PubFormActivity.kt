@@ -1,6 +1,7 @@
 package com.pubsbarsfinder.app
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -8,12 +9,15 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.pubsbarsfinder.app.databinding.ActivityPubFormBinding
@@ -21,6 +25,7 @@ import com.pubsbarsfinder.app.models.Amenity
 import com.pubsbarsfinder.app.models.labelRes
 import com.pubsbarsfinder.app.models.PubModel
 import kotlin.math.abs
+import androidx.core.net.toUri
 
 class PubFormActivity : AppCompatActivity() {
 
@@ -28,6 +33,8 @@ class PubFormActivity : AppCompatActivity() {
     private var existingPub: PubModel? = null
 
     private var hasTriedToSave = false
+
+    private var selectedImageUri: Uri? = null
 
     private val amenityCheckBoxes: Map<Amenity, CheckBox> by lazy {
         mapOf(
@@ -38,6 +45,17 @@ class PubFormActivity : AppCompatActivity() {
             Amenity.BEER_GARDEN to binding.amenityBeerGarden,
             Amenity.FOOD_SERVED to binding.amenityFoodServed,
         )
+    }
+
+    private val imagePicker = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) {
+            try {
+                contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            } catch (_: SecurityException) {
+            }
+            selectedImageUri = uri
+            showSelectedPhoto()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,12 +95,22 @@ class PubFormActivity : AppCompatActivity() {
                 showFieldError(binding.longitudeInput, binding.longitudeLabel, binding.longitudeError, hasError = readLongitude() == null)
             }
         }
+
+        binding.choosePhotoButton.setOnClickListener {
+            imagePicker.launch(arrayOf("image/*"))
+        }
+
+        binding.removePhotoButton.setOnClickListener {
+            selectedImageUri = null
+            showSelectedPhoto()
+        }
     }
 
     private fun loadPub() {
         val id = intent.getLongExtra(EXTRA_PUB_ID, -1L)
         val pub = if (id != -1L) PubData.store.findOne(id) else null
         existingPub = pub
+        selectedImageUri = pub?.imageUri?.toUri()
 
         if (pub != null) {
             binding.titleInput.setText(pub.title)
@@ -100,6 +128,7 @@ class PubFormActivity : AppCompatActivity() {
         } else {
             title = getString(R.string.screen_new_pub)
         }
+        showSelectedPhoto()
     }
 
     private fun savePub() {
@@ -111,6 +140,7 @@ class PubFormActivity : AppCompatActivity() {
         val longitude = readLongitude()
         val amenities = amenityCheckBoxes.filterValues { it.isChecked }.keys
         val isFavourite = binding.favouriteCheckBox.isChecked
+        val imageUri = selectedImageUri?.toString()
 
         showFieldError(input = binding.titleInput, label = binding.titleLabel, error = binding.titleError, hasError = title.isEmpty())
 
@@ -122,10 +152,10 @@ class PubFormActivity : AppCompatActivity() {
 
         val pub = existingPub
         if (pub == null) {
-            val newPub = PubData.store.create(PubModel(title = title, description = description, latitude = latitude, longitude = longitude, amenities = amenities, isFavourite = isFavourite))
+            val newPub = PubData.store.create(PubModel(title = title, description = description, latitude = latitude, longitude = longitude, amenities = amenities, isFavourite = isFavourite, imageUri = imageUri))
             Log.i(TAG, "Create new pub: $newPub")
         } else {
-            val updatedPub = pub.copy(title = title, description = description, latitude = latitude, longitude = longitude, amenities = amenities, isFavourite = isFavourite)
+            val updatedPub = pub.copy(title = title, description = description, latitude = latitude, longitude = longitude, amenities = amenities, isFavourite = isFavourite, imageUri = imageUri)
             PubData.store.update(updatedPub)
             Log.i(TAG, "Updated pub: $updatedPub")
         }
@@ -222,5 +252,23 @@ class PubFormActivity : AppCompatActivity() {
             abs(pub.latitude), latitudeDirection,
             abs(pub.longitude), longitudeDirection
         )
+    }
+
+    private fun showSelectedPhoto() {
+        val uri = selectedImageUri
+        if (uri != null) {
+            binding.photoPreview.setImageURI(uri)
+            binding.photoPreview.scaleType = ImageView.ScaleType.CENTER_CROP
+            binding.choosePhotoButton.setText(R.string.button_change_photo)
+        } else {
+            binding.photoPreview.setImageResource(R.drawable.ic_photo_placeholder)
+            binding.photoPreview.scaleType = ImageView.ScaleType.CENTER
+            binding.choosePhotoButton.setText(R.string.button_choose_photo)
+        }
+        if (binding.photoPreview.drawable == null) {
+            binding.photoPreview.setImageResource(R.drawable.ic_photo_placeholder)
+            binding.photoPreview.scaleType = ImageView.ScaleType.CENTER
+        }
+        binding.removePhotoButton.isVisible = uri != null
     }
 }
