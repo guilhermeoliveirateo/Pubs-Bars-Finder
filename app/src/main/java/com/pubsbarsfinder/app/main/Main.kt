@@ -70,8 +70,10 @@ fun addPub() {
     val description = readlnOrNull()?.trim().orEmpty()
     val latitude = readCoordinate("Latitude", -90.0, 90.0)
     val longitude = readCoordinate("Longitude", -180.0, 180.0)
+    val amenities = readAmenities(emptySet())
+    val isFavourite = readFavourite(false)
 
-    val pub = PubModel(title = title, description = description, latitude = latitude, longitude = longitude)
+    val pub = PubModel(title = title, description = description, latitude = latitude, longitude = longitude, amenities = amenities, isFavourite = isFavourite)
 
     val newPub = store.create(pub)
 
@@ -84,7 +86,7 @@ fun listPubs() {
         println("No pubs found.")
     } else {
         pubs.forEach {
-            println("ID: ${it.id} | Title: ${it.title} | Description: ${it.description} | Latitude: ${it.latitude} | Longitude: ${it.longitude} | Amenities: ${formatAmenities(it.amenities)}")
+            println("ID: ${it.id} | Title: ${it.title} | Description: ${it.description} | Latitude: ${it.latitude} | Longitude: ${it.longitude} | Amenities: ${formatAmenities(it.amenities)} | Favourite: ${if (it.isFavourite) "yes" else "no"}")
         }
     }
 }
@@ -103,7 +105,7 @@ fun searchPub() {
         return
     }
 
-    println("ID: ${pub.id} | Title: ${pub.title} | Description: ${pub.description} | Latitude: ${pub.latitude} | Longitude: ${pub.longitude} | Amenities: ${formatAmenities(pub.amenities)}")
+    println("ID: ${pub.id} | Title: ${pub.title} | Description: ${pub.description} | Latitude: ${pub.latitude} | Longitude: ${pub.longitude} | Amenities: ${formatAmenities(pub.amenities)} | Favourite: ${if (pub.isFavourite) "yes" else "no"}")
 }
 
 fun updatePub() {
@@ -127,8 +129,10 @@ fun updatePub() {
     val description = readlnOrNull()?.trim().orEmpty()
     val latitude = readCoordinate("Latitude", -90.0, 90.0)
     val longitude = readCoordinate("Longitude", -180.0, 180.0)
+    val amenities = readAmenities(pub.amenities)
+    val isFavourite = readFavourite(pub.isFavourite)
 
-    val updatedPub = pub.copy(title = title, description = description, latitude = latitude, longitude = longitude)
+    val updatedPub = pub.copy(title = title, description = description, latitude = latitude, longitude = longitude, amenities = amenities, isFavourite = isFavourite)
 
     if (store.update(updatedPub)) {
         println("Pub with ID ${updatedPub.id} was successfully updated.")
@@ -153,13 +157,52 @@ fun deletePub() {
     }
 }
 
-fun exit() {
-    println("Goodbye!!")
-}
-
 fun formatAmenities(amenities: Set<Amenity>): String {
     if (amenities.isEmpty()) return "none"
     return amenities.joinToString(", ") { amenity ->
         amenity.name.lowercase().replace('_', ' ').replaceFirstChar { it.uppercase() }
     }
+}
+
+fun readAmenities(current: Set<Amenity>): Set<Amenity> {
+    val amenities = Amenity.entries
+
+    println("Amenities:")
+    amenities.forEachIndexed { index, amenity ->
+        println("  ${index + 1}. ${formatAmenities(setOf(amenity))}")
+    }
+
+    while (true) {
+        print("Choose amenities (e.g. 1,3), 0 for none, Enter to keep [${formatAmenities(current)}]: ")
+        val input = readln().trim()
+
+        if (input.isEmpty()) return current
+        if (input == "0") return emptySet()
+
+        val numbers = input.split(",").map { it.trim().toIntOrNull() }
+        val validNumbers = numbers.filterNotNull().filter { it in 1..amenities.size }
+
+        if (validNumbers.size == numbers.size) {
+            return validNumbers.map { amenities[it - 1] }.toSet()
+        }
+        println("Invalid choice. Use numbers from 1 to ${amenities.size}, separated by commas.")
+    }
+}
+
+fun readFavourite(current: Boolean): Boolean {
+    val currentText = if (current) "yes" else "no"
+
+    while (true) {
+        print("Favourite? (y/n), Enter to keep [$currentText]: ")
+        when (readln().trim().lowercase()) {
+            "" -> return current
+            "y", "yes" -> return true
+            "n", "no" -> return false
+            else -> println("Invalid choice. Type y or n.")
+        }
+    }
+}
+
+fun exit() {
+    println("Goodbye!!")
 }
