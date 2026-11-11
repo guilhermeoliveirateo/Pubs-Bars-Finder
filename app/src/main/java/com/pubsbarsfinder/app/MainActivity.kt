@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -79,6 +80,10 @@ class MainActivity : AppCompatActivity(), PubListener {
                 showFilterDialog()
                 true
             }
+            R.id.action_delete_all -> {
+                confirmDeleteAll()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -109,6 +114,23 @@ class MainActivity : AppCompatActivity(), PubListener {
             }
             .setNegativeButton(R.string.button_cancel, null)
             .show()
+    }
+
+    private fun confirmDeleteAll() {
+        val size = PubData.store.findAll().size
+        if (size == 0) {
+            Toast.makeText(this, R.string.empty_list_state_delete_all_text, Toast.LENGTH_SHORT).show()
+        } else {
+            MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.dialog_delete_all_title)
+                .setMessage(getString(R.string.dialog_delete_all_message, size))
+                .setNegativeButton(R.string.button_cancel, null)
+                .setPositiveButton(R.string.button_delete_all) { _, _ ->
+                    PubData.store.deleteAll()
+                    showPubs()
+                }
+                .show()
+        }
     }
 
     private fun showPubs() {

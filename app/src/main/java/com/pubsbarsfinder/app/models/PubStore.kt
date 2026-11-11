@@ -16,4 +16,7 @@ interface PubStore {
 
     /** findOne: returns null if no pub with that id exists */
     fun findOne(id: Long): PubModel?
+
+    /** deleteAll: deletes all pubs from the store. */
+    fun deleteAll()
 }

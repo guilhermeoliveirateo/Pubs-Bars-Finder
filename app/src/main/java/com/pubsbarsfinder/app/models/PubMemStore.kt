@@ -40,4 +40,8 @@ class PubMemStore : PubStore {
         }
         return null
     }
+
+    override fun deleteAll() {
+        pubs.clear()
+    }
 }
