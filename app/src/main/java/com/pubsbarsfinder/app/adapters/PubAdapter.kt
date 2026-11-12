@@ -2,6 +2,7 @@ package com.pubsbarsfinder.app.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
@@ -57,10 +58,12 @@ class PubAdapter(
             val imageUri = pub.imageUri
             if (imageUri != null) {
                 binding.photoImage.setImageURI(imageUri.toUri())
-            } else {
-                binding.photoImage.setImageDrawable(null)
+                binding.photoImage.scaleType = ImageView.ScaleType.CENTER_CROP
             }
-            binding.photoImage.isVisible = binding.photoImage.drawable != null
+            if (imageUri == null || binding.photoImage.drawable == null) {
+                binding.photoImage.setImageResource(R.drawable.ic_photo_placeholder)
+                binding.photoImage.scaleType = ImageView.ScaleType.CENTER
+            }
         }
     }
 

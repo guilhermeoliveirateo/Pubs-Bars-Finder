@@ -13,10 +13,12 @@
         android:id="@+id/photoImage"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:layout_marginEnd="14dp"
-        android:importantForAccessibility="no"
-        android:scaleType="centerCrop"
         android:layout_gravity="center_vertical"
+        android:layout_marginEnd="14dp"
+        android:background="@color/divider"
+        android:importantForAccessibility="no"
+        android:scaleType="center"
+        android:src="@drawable/ic_photo_placeholder"
         app:shapeAppearanceOverlay="@style/ShapeAppearance.PubsBarsFinder.Photo"/>
 
     <LinearLayout
