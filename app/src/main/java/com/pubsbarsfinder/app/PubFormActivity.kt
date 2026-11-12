@@ -14,6 +14,7 @@ import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import java.util.Locale
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -55,6 +56,16 @@ class PubFormActivity : AppCompatActivity() {
             }
             selectedImageUri = uri
             showSelectedPhoto()
+        }
+    }
+
+    private val mapPicker = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val data = result.data
+        if (result.resultCode == RESULT_OK && data != null) {
+            val latitude = data.getDoubleExtra(MapPickerActivity.EXTRA_LATITUDE, 0.0)
+            val longitude = data.getDoubleExtra(MapPickerActivity.EXTRA_LONGITUDE, 0.0)
+            binding.latitudeInput.setText(formatCoordinate(latitude))
+            binding.longitudeInput.setText(formatCoordinate(longitude))
         }
     }
 
@@ -104,6 +115,8 @@ class PubFormActivity : AppCompatActivity() {
             selectedImageUri = null
             showSelectedPhoto()
         }
+
+        binding.chooseOnMapButton.setOnClickListener { openMapPicker() }
     }
 
     private fun loadPub() {
@@ -254,6 +267,9 @@ class PubFormActivity : AppCompatActivity() {
         )
     }
 
+    private fun formatCoordinate(value: Double): String =
+        String.format(Locale.ROOT, "%.6f", value)
+
     private fun showSelectedPhoto() {
         val uri = selectedImageUri
         if (uri != null) {
@@ -270,5 +286,23 @@ class PubFormActivity : AppCompatActivity() {
             binding.photoPreview.scaleType = ImageView.ScaleType.CENTER
         }
         binding.removePhotoButton.isVisible = uri != null
+    }
+
+    private fun openMapPicker() {
+        val intent = Intent(this, MapPickerActivity::class.java)
+
+        val latitude = readLatitude()
+        val longitude = readLongitude()
+        if (latitude != null && longitude != null) {
+            intent.putExtra(MapPickerActivity.EXTRA_LATITUDE, latitude)
+            intent.putExtra(MapPickerActivity.EXTRA_LONGITUDE, longitude)
+        }
+
+        val title = readTitle()
+        if (title.isNotEmpty()) {
+            intent.putExtra(MapPickerActivity.EXTRA_TITLE, title)
+        }
+
+        mapPicker.launch(intent)
     }
 }

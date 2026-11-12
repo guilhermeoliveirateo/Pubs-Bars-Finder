@@ -10,6 +10,7 @@ material = "1.14.0"
 constraintlayout = "2.2.2"
 activity = "1.13.0"
 recyclerview = "1.4.0"
+osmdroid = "6.1.20"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -22,6 +23,7 @@ material = { group = "com.google.android.material", name = "material", version.r
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "recyclerview" }
+osmdroid-android = { group = "org.osmdroid", name = "osmdroid-android", version.ref = "osmdroid" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
