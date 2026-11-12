@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.secrets.gradle.plugin)
 }
 
 android {
@@ -34,7 +33,6 @@ android {
     }
     buildFeatures {
         viewBinding = true
-        buildConfig = true
     }
 }
 
@@ -47,7 +45,7 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.recyclerview)
 
-    implementation(libs.play.services.maps)
+    implementation(libs.osmdroid.android)
     implementation(libs.play.services.location)
 
     testImplementation(libs.junit)

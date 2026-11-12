@@ -9,12 +9,11 @@
     android:orientation="vertical"
     tools:context=".MapPickerActivity">
 
-    <androidx.fragment.app.FragmentContainerView
+    <org.osmdroid.views.MapView
         android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_weight="1" />
 
     <View
         android:layout_width="match_parent"

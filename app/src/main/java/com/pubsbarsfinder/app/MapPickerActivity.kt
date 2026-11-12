@@ -6,24 +6,24 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
 import com.pubsbarsfinder.app.databinding.ActivityMapPickerBinding
+import org.osmdroid.config.Configuration
+import org.osmdroid.events.MapEventsReceiver
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.overlay.MapEventsOverlay
+import org.osmdroid.views.overlay.Marker
 
-class MapPickerActivity : AppCompatActivity(), OnMapReadyCallback {
+class MapPickerActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMapPickerBinding
-    private lateinit var map: GoogleMap
-    private lateinit var selectedLocation: LatLng
+    private lateinit var selectedLocation: GeoPoint
     private var marker: Marker? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Configuration.getInstance().userAgentValue = packageName
+
         enableEdgeToEdge()
         binding = ActivityMapPickerBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -37,52 +37,51 @@ class MapPickerActivity : AppCompatActivity(), OnMapReadyCallback {
         title = getString(R.string.screen_choose_location)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        selectedLocation = LatLng(
+        selectedLocation = GeoPoint(
             intent.getDoubleExtra(EXTRA_LATITUDE, DEFAULT_LATITUDE),
             intent.getDoubleExtra(EXTRA_LONGITUDE, DEFAULT_LONGITUDE)
         )
 
-        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
-        mapFragment.getMapAsync(this)
-
+        setUpMap()
         binding.confirmLocationButton.setOnClickListener { returnLocation() }
     }
 
-    override fun onMapReady(googleMap: GoogleMap) {
-        map = googleMap
-        map.uiSettings.isZoomControlsEnabled = true
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedLocation, DEFAULT_ZOOM))
+    private fun setUpMap() {
+        binding.map.setTileSource(TileSourceFactory.MAPNIK)
+        binding.map.setMultiTouchControls(true)
+        binding.map.controller.setZoom(DEFAULT_ZOOM)
+        binding.map.controller.setCenter(selectedLocation)
         setSelectedLocation(selectedLocation)
 
-        map.setOnMapClickListener { location -> setSelectedLocation(location) }
-
-        map.setOnMarkerDragListener(object : GoogleMap.OnMarkerDragListener {
-            override fun onMarkerDragStart(marker: Marker) {}
-            override fun onMarkerDrag(marker: Marker) {}
-            override fun onMarkerDragEnd(marker: Marker) {
-                selectedLocation = marker.position
+        val tapReceiver = object : MapEventsReceiver {
+            override fun singleTapConfirmedHelper(point: GeoPoint): Boolean {
+                setSelectedLocation(point)
+                return true
             }
-        })
-    }
 
-    override fun onSupportNavigateUp(): Boolean {
-        finish()
-        return true
-    }
-
-    private fun setSelectedLocation(location: LatLng) {
-        selectedLocation = location
-        val currentMarker = marker
-        if (currentMarker == null) {
-            marker = map.addMarker(
-                MarkerOptions()
-                    .position(location)
-                    .title(intent.getStringExtra(EXTRA_TITLE) ?: getString(R.string.marker_selected_location))
-                    .draggable(true)
-            )
-        } else {
-            currentMarker.position = location
+            override fun longPressHelper(point: GeoPoint): Boolean = false
         }
+        binding.map.overlays.add(0, MapEventsOverlay(tapReceiver))
+    }
+
+    private fun setSelectedLocation(location: GeoPoint) {
+        selectedLocation = location
+        val currentMarker = marker ?: Marker(binding.map).apply {
+            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+            title = intent.getStringExtra(EXTRA_TITLE) ?: getString(R.string.marker_selected_location)
+            isDraggable = true
+            setOnMarkerDragListener(object : Marker.OnMarkerDragListener {
+                override fun onMarkerDragStart(marker: Marker) {}
+                override fun onMarkerDrag(marker: Marker) {}
+                override fun onMarkerDragEnd(marker: Marker) {
+                    selectedLocation = marker.position
+                }
+            })
+            binding.map.overlays.add(this)
+            marker = this
+        }
+        currentMarker.position = location
+        binding.map.invalidate()
     }
 
     private fun returnLocation() {
@@ -93,13 +92,28 @@ class MapPickerActivity : AppCompatActivity(), OnMapReadyCallback {
         finish()
     }
 
+    override fun onResume() {
+        super.onResume()
+        binding.map.onResume()
+    }
+
+    override fun onPause() {
+        binding.map.onPause()
+        super.onPause()
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        finish()
+        return true
+    }
+
     companion object {
         const val EXTRA_LATITUDE = "latitude"
         const val EXTRA_LONGITUDE = "longitude"
         const val EXTRA_TITLE = "title"
 
-        private const val DEFAULT_LATITUDE = 52.25833
-        private const val DEFAULT_LONGITUDE = -7.11194
-        private const val DEFAULT_ZOOM = 16f
+        private const val DEFAULT_LATITUDE = 52.258330
+        private const val DEFAULT_LONGITUDE = -7.111940
+        private const val DEFAULT_ZOOM = 16.0
     }
 }

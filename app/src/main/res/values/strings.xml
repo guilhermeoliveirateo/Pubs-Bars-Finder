@@ -34,6 +34,7 @@
     <string name="button_apply">Apply</string>
     <string name="button_clear">Clear</string>
     <string name="button_choose_photo">Choose photo</string>
+    <string name="button_choose_on_map">Choose on map</string>
     <string name="button_change_photo">Change photo</string>
     <string name="button_remove_photo">Remove photo</string>
     <string name="button_use_this_location">Use this location</string>
