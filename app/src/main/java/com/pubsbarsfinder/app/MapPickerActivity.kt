@@ -112,8 +112,8 @@ class MapPickerActivity : AppCompatActivity() {
         const val EXTRA_LONGITUDE = "longitude"
         const val EXTRA_TITLE = "title"
 
-        private const val DEFAULT_LATITUDE = 52.258330
-        private const val DEFAULT_LONGITUDE = -7.111940
-        private const val DEFAULT_ZOOM = 16.0
+        const val DEFAULT_LATITUDE = 52.258330
+        const val DEFAULT_LONGITUDE = -7.111940
+        const val DEFAULT_ZOOM = 16.0
     }
 }
