@@ -84,6 +84,10 @@ class MainActivity : AppCompatActivity(), PubListener {
                 confirmDeleteAll()
                 true
             }
+            R.id.action_show_map -> {
+                startActivity(Intent(this, PubsMapActivity::class.java))
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
