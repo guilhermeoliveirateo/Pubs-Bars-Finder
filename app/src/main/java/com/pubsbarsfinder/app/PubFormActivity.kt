@@ -3,7 +3,6 @@ package com.pubsbarsfinder.app
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -27,6 +26,7 @@ import com.pubsbarsfinder.app.models.labelRes
 import com.pubsbarsfinder.app.models.PubModel
 import kotlin.math.abs
 import androidx.core.net.toUri
+import timber.log.Timber
 
 class PubFormActivity : AppCompatActivity() {
 
@@ -36,6 +36,8 @@ class PubFormActivity : AppCompatActivity() {
     private var hasTriedToSave = false
 
     private var selectedImageUri: Uri? = null
+
+    private lateinit var app: MainApp
 
     private val amenityCheckBoxes: Map<Amenity, CheckBox> by lazy {
         mapOf(
@@ -55,6 +57,7 @@ class PubFormActivity : AppCompatActivity() {
             } catch (_: SecurityException) {
             }
             selectedImageUri = uri
+            Timber.i("Photo chosen: $uri")
             showSelectedPhoto()
         }
     }
@@ -64,6 +67,7 @@ class PubFormActivity : AppCompatActivity() {
         if (result.resultCode == RESULT_OK && data != null) {
             val latitude = data.getDoubleExtra(MapPickerActivity.EXTRA_LATITUDE, 0.0)
             val longitude = data.getDoubleExtra(MapPickerActivity.EXTRA_LONGITUDE, 0.0)
+            Timber.i("Location chosen on map: $latitude, $longitude")
             binding.latitudeInput.setText(formatCoordinate(latitude))
             binding.longitudeInput.setText(formatCoordinate(longitude))
         }
@@ -71,6 +75,7 @@ class PubFormActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        app = application as MainApp
         enableEdgeToEdge()
         binding = ActivityPubFormBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -113,6 +118,7 @@ class PubFormActivity : AppCompatActivity() {
 
         binding.removePhotoButton.setOnClickListener {
             selectedImageUri = null
+            Timber.i("Photo removed")
             showSelectedPhoto()
         }
 
@@ -121,7 +127,7 @@ class PubFormActivity : AppCompatActivity() {
 
     private fun loadPub() {
         val id = intent.getLongExtra(EXTRA_PUB_ID, -1L)
-        val pub = if (id != -1L) PubData.store.findOne(id) else null
+        val pub = if (id != -1L) app.pubs.findOne(id) else null
         existingPub = pub
         selectedImageUri = pub?.imageUri?.toUri()
 
@@ -165,12 +171,12 @@ class PubFormActivity : AppCompatActivity() {
 
         val pub = existingPub
         if (pub == null) {
-            val newPub = PubData.store.create(PubModel(title = title, description = description, latitude = latitude, longitude = longitude, amenities = amenities, isFavourite = isFavourite, imageUri = imageUri))
-            Log.i(TAG, "Create new pub: $newPub")
+            val newPub = app.pubs.create(PubModel(title = title, description = description, latitude = latitude, longitude = longitude, amenities = amenities, isFavourite = isFavourite, imageUri = imageUri))
+            Timber.i("Created pub: $newPub")
         } else {
             val updatedPub = pub.copy(title = title, description = description, latitude = latitude, longitude = longitude, amenities = amenities, isFavourite = isFavourite, imageUri = imageUri)
-            PubData.store.update(updatedPub)
-            Log.i(TAG, "Updated pub: $updatedPub")
+            app.pubs.update(updatedPub)
+            Timber.i("Updated pub: $updatedPub")
         }
         finish()
     }
@@ -197,7 +203,6 @@ class PubFormActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_PUB_ID = "pub_id"
-        private const val TAG = "PubFormActivity"
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -228,7 +233,8 @@ class PubFormActivity : AppCompatActivity() {
             .setMessage(getString(R.string.dialog_delete_message, pub.title))
             .setNegativeButton(R.string.button_cancel, null)
             .setPositiveButton(R.string.button_delete) { _, _ ->
-                PubData.store.delete(pub.id)
+                app.pubs.delete(pub.id)
+                Timber.i("Deleted pub: $pub")
                 finish()
             }
             .show()
@@ -246,6 +252,7 @@ class PubFormActivity : AppCompatActivity() {
         val intent = Intent(Intent.ACTION_SEND)
         intent.type = "text/plain"
         intent.putExtra(Intent.EXTRA_TEXT, text)
+        Timber.i("Sharing pub: ${pub.title}")
         startActivity(Intent.createChooser(intent, getString(R.string.share_chooser_title)))
     }
 

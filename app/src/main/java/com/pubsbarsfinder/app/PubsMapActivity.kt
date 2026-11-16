@@ -14,13 +14,17 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.Marker
+import timber.log.Timber
 
 class PubsMapActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPubsMapBinding
 
+    private lateinit var app: MainApp
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        app = application as MainApp
         Configuration.getInstance().userAgentValue = packageName
 
         enableEdgeToEdge()
@@ -52,7 +56,7 @@ class PubsMapActivity : AppCompatActivity() {
     }
 
     private fun showPubMarkers() {
-        val pubs = PubData.store.findAll()
+        val pubs = app.pubs.findAll()
         binding.map.overlays.clear()
 
         pubs.forEach { pub ->
@@ -74,6 +78,7 @@ class PubsMapActivity : AppCompatActivity() {
         }
 
         zoomToPubs(pubs)
+        Timber.i("Showing ${pubs.size} pubs on the map")
         binding.map.invalidate()
     }
 
