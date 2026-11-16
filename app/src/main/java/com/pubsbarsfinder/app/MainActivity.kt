@@ -19,6 +19,7 @@ import com.pubsbarsfinder.app.databinding.ActivityMainBinding
 import com.pubsbarsfinder.app.models.Amenity
 import com.pubsbarsfinder.app.models.PubModel
 import com.pubsbarsfinder.app.models.labelRes
+import timber.log.Timber
 
 class MainActivity : AppCompatActivity(), PubListener {
 
@@ -29,8 +30,11 @@ class MainActivity : AppCompatActivity(), PubListener {
 
     private val pubAdapter = PubAdapter(emptyList(), this)
 
+    private lateinit var app: MainApp
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        app = application as MainApp
         enableEdgeToEdge()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -65,7 +69,8 @@ class MainActivity : AppCompatActivity(), PubListener {
     }
 
     override fun onFavouriteClick(pub: PubModel) {
-        PubData.store.update(pub.copy(isFavourite = !pub.isFavourite))
+        app.pubs.update(pub.copy(isFavourite = !pub.isFavourite))
+        Timber.i("Toggled favourite for pub ${pub.id}: ${!pub.isFavourite}")
         showPubs()
     }
 
@@ -109,11 +114,13 @@ class MainActivity : AppCompatActivity(), PubListener {
             .setPositiveButton(R.string.button_apply) { _, _ ->
                 favouritesOnly = checked[0]
                 selectedAmenities = amenities.filterIndexed { index, _ -> checked[index + 1] }.toSet()
+                Timber.i("Filters applied: favouritesOnly=$favouritesOnly, amenities=$selectedAmenities")
                 showPubs()
             }
             .setNeutralButton(R.string.button_clear) { _, _ ->
                 favouritesOnly = false
                 selectedAmenities = emptySet()
+                Timber.i("Filters cleared")
                 showPubs()
             }
             .setNegativeButton(R.string.button_cancel, null)
@@ -121,7 +128,7 @@ class MainActivity : AppCompatActivity(), PubListener {
     }
 
     private fun confirmDeleteAll() {
-        val size = PubData.store.findAll().size
+        val size = app.pubs.findAll().size
         if (size == 0) {
             Toast.makeText(this, R.string.empty_list_state_delete_all_text, Toast.LENGTH_SHORT).show()
         } else {
@@ -130,7 +137,8 @@ class MainActivity : AppCompatActivity(), PubListener {
                 .setMessage(getString(R.string.dialog_delete_all_message, size))
                 .setNegativeButton(R.string.button_cancel, null)
                 .setPositiveButton(R.string.button_delete_all) { _, _ ->
-                    PubData.store.deleteAll()
+                    app.pubs.deleteAll()
+                    Timber.i("Deleted all $size pubs")
                     showPubs()
                 }
                 .show()
@@ -139,7 +147,7 @@ class MainActivity : AppCompatActivity(), PubListener {
 
     private fun showPubs() {
         val query = binding.searchInput.text.toString().trim()
-        val allPubs = PubData.store.findAll()
+        val allPubs = app.pubs.findAll()
         val pubs = allPubs.filter { it.title.contains(query, ignoreCase = true) && (!favouritesOnly || it.isFavourite) && it.amenities.containsAll(selectedAmenities) }
 
         pubAdapter.updatePubs(pubs)

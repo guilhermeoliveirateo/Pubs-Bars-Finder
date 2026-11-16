@@ -13,6 +13,7 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
+import timber.log.Timber
 
 class MapPickerActivity : AppCompatActivity() {
 
@@ -88,6 +89,7 @@ class MapPickerActivity : AppCompatActivity() {
         val result = Intent()
             .putExtra(EXTRA_LATITUDE, selectedLocation.latitude)
             .putExtra(EXTRA_LONGITUDE, selectedLocation.longitude)
+        Timber.i("Location confirmed: ${selectedLocation.latitude}, ${selectedLocation.longitude}")
         setResult(RESULT_OK, result)
         finish()
     }
