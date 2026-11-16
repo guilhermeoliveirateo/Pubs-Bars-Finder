@@ -3,6 +3,7 @@
     <string name="screen_new_pub">New pub</string>
     <string name="screen_edit_pub">Edit pub</string>
     <string name="screen_choose_location">Choose location</string>
+    <string name="screen_pubs_map">Pubs map</string>
     <string name="section_about">About the pub</string>
     <string name="section_location">Location</string>
     <string name="section_amenities">Amenities</string>
@@ -25,6 +26,7 @@
     <string name="empty_list_state_text">No pubs yet. Tap Add pub to save your first one.</string>
     <string name="empty_list_state_delete_all_text">There are no pubs to delete.</string>
     <string name="empty_state_no_search_results">No pubs match your search/filter.</string>
+    <string name="message_no_pubs_on_map">No pubs to show yet.</string>
     <string name="button_cancel">Cancel</string>
     <string name="button_add_pub">Add pub</string>
     <string name="button_save_pub">Save pub</string>
@@ -47,6 +49,7 @@
     <string name="action_add_favourites">Add to favourites</string>
     <string name="action_remove_favourites">Remove from favourites</string>
     <string name="action_delete_all">Delete all pubs</string>
+    <string name="action_show_map">Show pubs on map</string>
     <string name="dialog_delete_title">Delete pub?</string>
     <string name="dialog_delete_message">%1$s will be permanently deleted.</string>
     <string name="dialog_delete_all_title">Delete all pubs?</string>
@@ -61,6 +64,7 @@
     <string name="amenity_pet_friendly">Pet friendly</string>
     <string name="separator_amenities">" · "</string>
     <string name="marker_selected_location">Selected location</string>
+    <string name="marker_tap_again_to_edit">Tap again to edit</string>
     <string name="format_coordinates">%1$.4f° %2$s, %3$.4f° %4$s</string>
     <string name="format_filter">Filtered by: %1$s</string>
     <string name="direction_north">N</string>
