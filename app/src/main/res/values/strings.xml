@@ -4,6 +4,7 @@
     <string name="screen_edit_pub">Edit pub</string>
     <string name="screen_choose_location">Choose location</string>
     <string name="screen_pubs_map">Pubs map</string>
+    <string name="screen_pub_details">Pub details</string>
     <string name="section_about">About the pub</string>
     <string name="section_location">Location</string>
     <string name="section_amenities">Amenities</string>
@@ -50,10 +51,13 @@
     <string name="action_remove_favourites">Remove from favourites</string>
     <string name="action_delete_all">Delete all pubs</string>
     <string name="action_show_map">Show pubs on map</string>
+    <string name="action_edit_pub">Edit pub</string>
     <string name="dialog_delete_title">Delete pub?</string>
     <string name="dialog_delete_message">%1$s will be permanently deleted.</string>
     <string name="dialog_delete_all_title">Delete all pubs?</string>
     <string name="dialog_delete_all_message">All %1$d pubs will be permanently deleted.</string>
+    <string name="details_no_description">No description</string>
+    <string name="details_no_amenities">No amenities listed</string>
     <string name="share_chooser_title">Share pub via</string>
     <string name="format_map_link">https://maps.google.com/?q=%1$s,%2$s</string>
     <string name="amenity_live_music">Live music</string>
@@ -64,7 +68,7 @@
     <string name="amenity_pet_friendly">Pet friendly</string>
     <string name="separator_amenities">" · "</string>
     <string name="marker_selected_location">Selected location</string>
-    <string name="marker_tap_again_to_edit">Tap again to edit</string>
+    <string name="marker_tap_again_for_details">Tap again for details</string>
     <string name="format_coordinates">%1$.4f° %2$s, %3$.4f° %4$s</string>
     <string name="format_filter">Filtered by: %1$s</string>
     <string name="direction_north">N</string>

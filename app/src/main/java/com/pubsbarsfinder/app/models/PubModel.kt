@@ -1,7 +1,9 @@
 package com.pubsbarsfinder.app.models
 
+import android.content.Context
 import androidx.annotation.StringRes
 import com.pubsbarsfinder.app.R
+import kotlin.math.abs
 
 /** A pub or bar saved by the user. */
 data class PubModel(
@@ -32,3 +34,16 @@ fun Amenity.labelRes(): Int = when (this) {
     Amenity.BEER_GARDEN -> R.string.amenity_beer_garden
     Amenity.LIVE_MUSIC -> R.string.amenity_live_music
 }
+
+fun PubModel.formattedCoordinates(context: Context): String {
+    val latitudeDirection = context.getString(if (latitude >= 0) R.string.direction_north else R.string.direction_south)
+    val longitudeDirection = context.getString(if (longitude >= 0) R.string.direction_east else R.string.direction_west)
+    return context.getString(
+        R.string.format_coordinates,
+        abs(latitude), latitudeDirection,
+        abs(longitude), longitudeDirection
+    )
+}
+
+fun PubModel.formattedAmenities(context: Context): String =
+    amenities.joinToString(context.getString(R.string.separator_amenities)) { context.getString(it.labelRes()) }

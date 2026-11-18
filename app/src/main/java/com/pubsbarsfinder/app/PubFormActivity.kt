@@ -26,6 +26,8 @@ import com.pubsbarsfinder.app.models.labelRes
 import com.pubsbarsfinder.app.models.PubModel
 import kotlin.math.abs
 import androidx.core.net.toUri
+import com.pubsbarsfinder.app.models.formattedAmenities
+import com.pubsbarsfinder.app.models.formattedCoordinates
 import timber.log.Timber
 
 class PubFormActivity : AppCompatActivity() {
@@ -244,8 +246,8 @@ class PubFormActivity : AppCompatActivity() {
         val text = listOf(
             pub.title,
             pub.description,
-            formatCoordinates(pub),
-            pub.amenities.joinToString(getString(R.string.separator_amenities)) { getString(it.labelRes()) },
+            pub.formattedCoordinates(this),
+            pub.formattedAmenities(this),
             getString(R.string.format_map_link, pub.latitude.toString(), pub.longitude.toString())
         ).filter { it.isNotEmpty() }.joinToString("\n")
 
@@ -254,24 +256,6 @@ class PubFormActivity : AppCompatActivity() {
         intent.putExtra(Intent.EXTRA_TEXT, text)
         Timber.i("Sharing pub: ${pub.title}")
         startActivity(Intent.createChooser(intent, getString(R.string.share_chooser_title)))
-    }
-
-    private fun formatCoordinates(pub: PubModel): String {
-        val latitudeDirection = getString(if (pub.latitude >= 0) {
-            R.string.direction_north
-        } else {
-            R.string.direction_south
-        })
-        val longitudeDirection = getString(if (pub.longitude >= 0) {
-            R.string.direction_east
-        } else {
-            R.string.direction_west
-        })
-        return getString(
-            R.string.format_coordinates,
-            abs(pub.latitude), latitudeDirection,
-            abs(pub.longitude), longitudeDirection
-        )
     }
 
     private fun formatCoordinate(value: Double): String =

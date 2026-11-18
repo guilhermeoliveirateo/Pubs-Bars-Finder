@@ -9,8 +9,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.pubsbarsfinder.app.R
 import com.pubsbarsfinder.app.databinding.ItemPubBinding
 import com.pubsbarsfinder.app.models.PubModel
+import com.pubsbarsfinder.app.models.formattedAmenities
+import com.pubsbarsfinder.app.models.formattedCoordinates
 import com.pubsbarsfinder.app.models.labelRes
-import kotlin.math.abs
 
 class PubAdapter(
     private var pubs: List<PubModel>,
@@ -33,18 +34,10 @@ class PubAdapter(
             binding.amenitiesText.isVisible = pub.amenities.isNotEmpty()
 
             val context = binding.root.context
-            val latitudeDirection = context.getString(if (pub.latitude >= 0) R.string.direction_north else R.string.direction_south)
-            val longitudeDirection = context.getString(if (pub.longitude >= 0) R.string.direction_east else R.string.direction_west)
 
-            binding.coordinatesText.text = context.getString(
-                R.string.format_coordinates,
-                abs(pub.latitude), latitudeDirection,
-                abs(pub.longitude), longitudeDirection
-            )
+            binding.coordinatesText.text = pub.formattedCoordinates(context)
 
-            binding.amenitiesText.text = pub.amenities.joinToString(
-                separator = context.getString(R.string.separator_amenities)
-            ) { context.getString(it.labelRes()) }
+            binding.amenitiesText.text = pub.formattedAmenities(context)
 
             binding.root.setOnClickListener { listener.onPubClick(pub) }
 
