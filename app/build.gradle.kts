@@ -44,11 +44,9 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.recyclerview)
-
     implementation(libs.osmdroid.android)
-
     implementation(libs.timber)
-
+    implementation(libs.gson)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
