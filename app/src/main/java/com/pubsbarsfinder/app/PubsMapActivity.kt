@@ -63,7 +63,7 @@ class PubsMapActivity : AppCompatActivity() {
             val marker = Marker(binding.map).apply {
                 position = GeoPoint(pub.latitude, pub.longitude)
                 title = pub.title
-                subDescription = getString(R.string.marker_tap_again_to_edit)
+                subDescription = getString(R.string.marker_tap_again_for_details)
                 setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                 setOnMarkerClickListener { clickedMarker, _ ->
                     if (clickedMarker.isInfoWindowShown) {

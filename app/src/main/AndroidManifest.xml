@@ -14,6 +14,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PubsBarsFinder">
         <activity
+            android:name=".PubDetailsActivity"
+            android:exported="false" />
+        <activity
             android:name=".PubsMapActivity"
             android:exported="false" />
         <activity

@@ -63,8 +63,8 @@ class MainActivity : AppCompatActivity(), PubListener {
     }
 
     override fun onPubClick(pub: PubModel) {
-        val intent = Intent(this, PubFormActivity::class.java)
-        intent.putExtra(PubFormActivity.EXTRA_PUB_ID, pub.id)
+        val intent = Intent(this, PubDetailsActivity::class.java)
+            .putExtra(PubFormActivity.EXTRA_PUB_ID, pub.id)
         startActivity(intent)
     }
 
