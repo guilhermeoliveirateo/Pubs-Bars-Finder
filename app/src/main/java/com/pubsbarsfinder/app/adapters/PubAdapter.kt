@@ -11,7 +11,6 @@ import com.pubsbarsfinder.app.databinding.ItemPubBinding
 import com.pubsbarsfinder.app.models.PubModel
 import com.pubsbarsfinder.app.models.formattedAmenities
 import com.pubsbarsfinder.app.models.formattedCoordinates
-import com.pubsbarsfinder.app.models.labelRes
 
 class PubAdapter(
     private var pubs: List<PubModel>,
@@ -24,39 +23,7 @@ class PubAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(pub: PubModel) {
-            binding.titleText.text = pub.title
-            binding.descriptionText.text = pub.description
-                .lines()
-                .map { it.trim() }
-                .filter { it.isNotEmpty() }
-                .joinToString(" ")
-            binding.descriptionText.isVisible = pub.description.isNotEmpty()
-            binding.amenitiesText.isVisible = pub.amenities.isNotEmpty()
-
-            val context = binding.root.context
-
-            binding.coordinatesText.text = pub.formattedCoordinates(context)
-
-            binding.amenitiesText.text = pub.formattedAmenities(context)
-
-            binding.root.setOnClickListener { listener.onPubClick(pub) }
-
-            val favouriteIcon = if (pub.isFavourite) R.drawable.ic_favourite else R.drawable.ic_favourite_border
-            val favouriteDescription = if (pub.isFavourite) R.string.content_description_remove_favourite else R.string.content_description_add_favourite
-
-            binding.favouriteButton.setImageResource(favouriteIcon)
-            binding.favouriteButton.contentDescription = context.getString(favouriteDescription)
-            binding.favouriteButton.setOnClickListener { listener.onFavouriteClick(pub) }
-
-            val imageUri = pub.imageUri
-            if (imageUri != null) {
-                binding.photoImage.setImageURI(imageUri.toUri())
-                binding.photoImage.scaleType = ImageView.ScaleType.CENTER_CROP
-            }
-            if (imageUri == null || binding.photoImage.drawable == null) {
-                binding.photoImage.setImageResource(R.drawable.ic_photo_placeholder)
-                binding.photoImage.scaleType = ImageView.ScaleType.CENTER
-            }
+            binding.bindPub(pub, listener)
         }
     }
 
@@ -83,4 +50,40 @@ class PubAdapter(
             notifyItemRangeRemoved(newSize, oldSize - newSize)
         }
     }
+}
+
+fun ItemPubBinding.bindPub(pub: PubModel, listener: PubListener) {
+    val context = root.context
+
+    titleText.text = pub.title
+    descriptionText.text = pub.description
+        .lines()
+        .map { it.trim() }
+        .filter { it.isNotEmpty() }
+        .joinToString(" ")
+    descriptionText.isVisible = pub.description.isNotEmpty()
+
+    amenitiesText.text = pub.formattedAmenities(context)
+    amenitiesText.isVisible = pub.amenities.isNotEmpty()
+
+    coordinatesText.text = pub.formattedCoordinates(context)
+
+    val favouriteIcon = if (pub.isFavourite) R.drawable.ic_favourite else R.drawable.ic_favourite_border
+    val favouriteDescription =
+        if (pub.isFavourite) R.string.content_description_remove_favourite else R.string.content_description_add_favourite
+    favouriteButton.setImageResource(favouriteIcon)
+    favouriteButton.contentDescription = context.getString(favouriteDescription)
+    favouriteButton.setOnClickListener { listener.onFavouriteClick(pub) }
+
+    val imageUri = pub.imageUri
+    if (imageUri != null) {
+        photoImage.setImageURI(imageUri.toUri())
+        photoImage.scaleType = ImageView.ScaleType.CENTER_CROP
+    }
+    if (imageUri == null || photoImage.drawable == null) {
+        photoImage.setImageResource(R.drawable.ic_photo_placeholder)
+        photoImage.scaleType = ImageView.ScaleType.CENTER
+    }
+
+    root.setOnClickListener { listener.onPubClick(pub) }
 }
