@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Widget.PubsBarsFinder.SectionTitle" parent="">
+        <item name="android:textColor">@color/accent</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Widget.PubsBarsFinder.FieldLabel" parent="">
+        <item name="android:textColor">@color/text_label</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="Widget.PubsBarsFinder.PrimaryButton" parent="Widget.Material3.Button">
+        <item name="android:backgroundTint">@color/accent</item>
+        <item name="android:textColor">@color/on_accent</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="cornerRadius">8dp</item>
+    </style>
+
+    <style name="Widget.PubsBarsFinder.SecondaryButton" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">16sp</item>
+        <item name="cornerRadius">8dp</item>
+        <item name="strokeColor">@color/field_border</item>
+    </style>
+
+    <style name="Widget.PubsBarsFinder.AmenityCheckBox" parent="Widget.Material3.CompoundButton.CheckBox">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">15sp</item>
+        <item name="buttonTint">@color/accent</item>
+    </style>
+
+</resources>
