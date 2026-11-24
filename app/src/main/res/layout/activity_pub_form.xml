@@ -26,36 +26,33 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    style="@style/Widget.PubsBarsFinder.SectionTitle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/section_about"
-                    android:textColor="@color/accent"
-                    android:textSize="14sp"
-                    android:textStyle="bold"/>
+                    android:text="@string/section_about"/>
 
                 <CheckBox
                     android:id="@+id/favouriteCheckBox"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:minHeight="0dp"
-                    android:minWidth="0dp"
                     android:button="@drawable/selector_favourite"
                     android:contentDescription="@string/label_favourite"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
                     app:buttonTint="@color/accent"
-                    app:useMaterialThemeColors="false" />
+                    app:useMaterialThemeColors="false"/>
 
             </LinearLayout>
 
             <TextView
                 android:id="@+id/titleLabel"
+                style="@style/Widget.PubsBarsFinder.FieldLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
+                android:layout_marginTop="12dp"
                 android:labelFor="@id/titleInput"
-                android:text="@string/label_title"
-                android:textColor="@color/text_label"
-                android:textSize="14sp"/>
+                android:text="@string/label_title"/>
 
             <EditText
                 android:id="@+id/titleInput"
@@ -63,11 +60,11 @@
                 android:layout_height="52dp"
                 android:layout_marginTop="6dp"
                 android:background="@drawable/bg_field"
+                android:hint="@string/hint_title_input"
                 android:importantForAutofill="no"
                 android:inputType="textCapWords"
                 android:paddingHorizontal="14dp"
                 android:textColor="@color/text_primary"
-                android:hint="@string/hint_title_input"
                 android:textSize="16sp"/>
 
             <TextView
@@ -82,13 +79,12 @@
 
             <TextView
                 android:id="@+id/descriptionLabel"
+                style="@style/Widget.PubsBarsFinder.FieldLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:labelFor="@id/descriptionInput"
-                android:text="@string/label_description"
-                android:textColor="@color/text_label"
-                android:textSize="14sp"/>
+                android:text="@string/label_description"/>
 
             <EditText
                 android:id="@+id/descriptionInput"
@@ -97,22 +93,20 @@
                 android:layout_marginTop="6dp"
                 android:background="@drawable/bg_field"
                 android:gravity="top|start"
+                android:hint="@string/hint_description_input"
                 android:importantForAutofill="no"
                 android:inputType="textCapSentences|textMultiLine"
                 android:paddingHorizontal="14dp"
                 android:paddingVertical="14dp"
                 android:textColor="@color/text_primary"
-                android:hint="@string/hint_description_input"
                 android:textSize="16sp"/>
 
             <TextView
+                style="@style/Widget.PubsBarsFinder.SectionTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="@string/section_photo"
-                android:textColor="@color/accent"
-                android:textSize="14sp"
-                android:textStyle="bold"/>
+                android:text="@string/section_photo"/>
 
             <ImageView
                 android:id="@+id/photoPreview"
@@ -132,38 +126,29 @@
 
                 <Button
                     android:id="@+id/choosePhotoButton"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    style="@style/Widget.PubsBarsFinder.SecondaryButton"
                     android:layout_width="0dp"
                     android:layout_height="48dp"
                     android:layout_marginEnd="12dp"
                     android:layout_weight="1"
-                    android:text="@string/button_choose_photo"
-                    android:textColor="@color/text_primary"
-                    android:textSize="16sp"
-                    app:cornerRadius="8dp"
-                    app:strokeColor="@color/field_border"/>
+                    android:text="@string/button_choose_photo"/>
 
                 <Button
                     android:id="@+id/removePhotoButton"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    style="@style/Widget.PubsBarsFinder.SecondaryButton"
                     android:layout_width="0dp"
                     android:layout_height="48dp"
                     android:layout_weight="1"
-                    android:text="@string/button_remove_photo"
-                    android:textColor="@color/text_primary"
-                    android:textSize="16sp"
-                    app:cornerRadius="8dp"
-                    app:strokeColor="@color/field_border"/>
+                    android:text="@string/button_remove_photo"/>
+
             </LinearLayout>
 
             <TextView
+                style="@style/Widget.PubsBarsFinder.SectionTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="@string/section_amenities"
-                android:textColor="@color/accent"
-                android:textSize="14sp"
-                android:textStyle="bold"/>
+                android:text="@string/section_amenities"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -172,25 +157,19 @@
 
                 <CheckBox
                     android:id="@+id/amenityLiveMusic"
+                    style="@style/Widget.PubsBarsFinder.AmenityCheckBox"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginTop="8dp"
-                    android:text="@string/amenity_live_music"
-                    android:textSize="15sp"
-                    android:textColor="@color/text_primary"
-                    android:buttonTint="@color/accent"/>
+                    android:text="@string/amenity_live_music"/>
 
                 <CheckBox
                     android:id="@+id/amenityWheelchairAccessible"
+                    style="@style/Widget.PubsBarsFinder.AmenityCheckBox"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginTop="8dp"
-                    android:text="@string/amenity_wheelchair_accessible"
-                    android:textSize="15sp"
-                    android:textColor="@color/text_primary"
-                    android:buttonTint="@color/accent"/>
+                    android:text="@string/amenity_wheelchair_accessible"/>
 
             </LinearLayout>
 
@@ -201,23 +180,19 @@
 
                 <CheckBox
                     android:id="@+id/amenitySportsOnTv"
+                    style="@style/Widget.PubsBarsFinder.AmenityCheckBox"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/amenity_sports_on_tv"
-                    android:textSize="15sp"
-                    android:textColor="@color/text_primary"
-                    android:buttonTint="@color/accent"/>
+                    android:text="@string/amenity_sports_on_tv"/>
 
                 <CheckBox
                     android:id="@+id/amenityPetFriendly"
+                    style="@style/Widget.PubsBarsFinder.AmenityCheckBox"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/amenity_pet_friendly"
-                    android:textSize="15sp"
-                    android:textColor="@color/text_primary"
-                    android:buttonTint="@color/accent"/>
+                    android:text="@string/amenity_pet_friendly"/>
 
             </LinearLayout>
 
@@ -228,39 +203,33 @@
 
                 <CheckBox
                     android:id="@+id/amenityBeerGarden"
+                    style="@style/Widget.PubsBarsFinder.AmenityCheckBox"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/amenity_beer_garden"
-                    android:textSize="15sp"
-                    android:textColor="@color/text_primary"
-                    android:buttonTint="@color/accent"/>
+                    android:text="@string/amenity_beer_garden"/>
 
                 <CheckBox
                     android:id="@+id/amenityFoodServed"
+                    style="@style/Widget.PubsBarsFinder.AmenityCheckBox"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/amenity_food_served"
-                    android:textSize="15sp"
-                    android:textColor="@color/text_primary"
-                    android:buttonTint="@color/accent"/>
+                    android:text="@string/amenity_food_served"/>
 
             </LinearLayout>
 
             <TextView
+                style="@style/Widget.PubsBarsFinder.SectionTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="@string/section_location"
-                android:textColor="@color/accent"
-                android:textSize="14sp"
-                android:textStyle="bold"/>
+                android:text="@string/section_location"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="14dp"
                 android:orientation="horizontal">
 
                 <LinearLayout
@@ -272,12 +241,11 @@
 
                     <TextView
                         android:id="@+id/latitudeLabel"
+                        style="@style/Widget.PubsBarsFinder.FieldLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:labelFor="@id/latitudeInput"
-                        android:text="@string/label_latitude"
-                        android:textColor="@color/text_label"
-                        android:textSize="14sp"/>
+                        android:text="@string/label_latitude"/>
 
                     <EditText
                         android:id="@+id/latitudeInput"
@@ -285,11 +253,11 @@
                         android:layout_height="52dp"
                         android:layout_marginTop="6dp"
                         android:background="@drawable/bg_field"
+                        android:hint="@string/hint_latitude_input"
                         android:importantForAutofill="no"
                         android:inputType="numberDecimal|numberSigned"
                         android:paddingHorizontal="14dp"
                         android:textColor="@color/text_primary"
-                        android:hint="@string/hint_latitude_input"
                         android:textSize="16sp"/>
 
                     <TextView
@@ -301,6 +269,7 @@
                         android:textColor="@color/error"
                         android:textSize="13sp"
                         android:visibility="gone"/>
+
                 </LinearLayout>
 
                 <LinearLayout
@@ -311,12 +280,11 @@
 
                     <TextView
                         android:id="@+id/longitudeLabel"
+                        style="@style/Widget.PubsBarsFinder.FieldLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:labelFor="@id/longitudeInput"
-                        android:text="@string/label_longitude"
-                        android:textColor="@color/text_label"
-                        android:textSize="14sp"/>
+                        android:text="@string/label_longitude"/>
 
                     <EditText
                         android:id="@+id/longitudeInput"
@@ -324,11 +292,11 @@
                         android:layout_height="52dp"
                         android:layout_marginTop="6dp"
                         android:background="@drawable/bg_field"
+                        android:hint="@string/hint_longitude_input"
                         android:importantForAutofill="no"
                         android:inputType="numberDecimal|numberSigned"
                         android:paddingHorizontal="14dp"
                         android:textColor="@color/text_primary"
-                        android:hint="@string/hint_longitude_input"
                         android:textSize="16sp"/>
 
                     <TextView
@@ -340,24 +308,29 @@
                         android:textColor="@color/error"
                         android:textSize="13sp"
                         android:visibility="gone"/>
+
                 </LinearLayout>
 
             </LinearLayout>
 
+            <TextView
+                android:id="@+id/coordinatesRangeHint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="@string/hint_coordinate_ranges"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp"/>
+
             <Button
                 android:id="@+id/chooseOnMapButton"
-                style="@style/Widget.Material3.Button.OutlinedButton"
+                style="@style/Widget.PubsBarsFinder.SecondaryButton"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginTop="12dp"
-                android:text="@string/button_choose_on_map"
-                android:textColor="@color/text_primary"
-                android:textSize="16sp"
-                app:cornerRadius="8dp"
-                app:strokeColor="@color/field_border"/>
+                android:text="@string/button_choose_on_map"/>
 
         </LinearLayout>
-
     </ScrollView>
 
     <View
@@ -375,29 +348,20 @@
 
         <Button
             android:id="@+id/cancelButton"
-            style="@style/Widget.Material3.Button.OutlinedButton"
+            style="@style/Widget.PubsBarsFinder.SecondaryButton"
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_marginEnd="12dp"
             android:layout_weight="1"
-            android:text="@string/button_cancel"
-            android:textColor="@color/text_primary"
-            android:textSize="16sp"
-            app:cornerRadius="8dp"
-            app:strokeColor="@color/field_border"/>
+            android:text="@string/button_cancel"/>
 
         <Button
             android:id="@+id/saveButton"
-            style="@style/Widget.Material3.Button"
+            style="@style/Widget.PubsBarsFinder.PrimaryButton"
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
-            android:backgroundTint="@color/accent"
-            android:text="@string/button_save_pub"
-            android:textColor="@color/on_accent"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:cornerRadius="8dp"/>
+            android:text="@string/button_save_pub"/>
 
     </LinearLayout>
 

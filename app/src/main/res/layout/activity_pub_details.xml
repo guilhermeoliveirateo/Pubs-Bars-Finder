@@ -63,13 +63,11 @@
                 android:textSize="16sp"/>
 
             <TextView
+                style="@style/Widget.PubsBarsFinder.SectionTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="@string/section_amenities"
-                android:textColor="@color/accent"
-                android:textSize="14sp"
-                android:textStyle="bold"/>
+                android:text="@string/section_amenities"/>
 
             <TextView
                 android:id="@+id/amenitiesText"
@@ -80,13 +78,11 @@
                 android:textSize="15sp"/>
 
             <TextView
+                style="@style/Widget.PubsBarsFinder.SectionTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="@string/section_location"
-                android:textColor="@color/accent"
-                android:textSize="14sp"
-                android:textStyle="bold"/>
+                android:text="@string/section_location"/>
 
             <TextView
                 android:id="@+id/coordinatesText"
@@ -95,6 +91,23 @@
                 android:layout_marginTop="14dp"
                 android:textColor="@color/text_primary"
                 android:textSize="15sp"/>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/field_border"
+                app:strokeWidth="1dp">
+
+                <org.osmdroid.views.MapView
+                    android:id="@+id/locationMap"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:importantForAccessibility="no"/>
+
+            </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
 
