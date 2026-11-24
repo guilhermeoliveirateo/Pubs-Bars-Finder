@@ -3,8 +3,6 @@ package com.pubsbarsfinder.app
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.widget.CheckBox
 import android.widget.EditText
@@ -19,15 +17,10 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.pubsbarsfinder.app.databinding.ActivityPubFormBinding
 import com.pubsbarsfinder.app.models.Amenity
-import com.pubsbarsfinder.app.models.labelRes
 import com.pubsbarsfinder.app.models.PubModel
-import kotlin.math.abs
 import androidx.core.net.toUri
-import com.pubsbarsfinder.app.models.formattedAmenities
-import com.pubsbarsfinder.app.models.formattedCoordinates
 import timber.log.Timber
 
 class PubFormActivity : AppCompatActivity() {
@@ -127,6 +120,11 @@ class PubFormActivity : AppCompatActivity() {
         binding.chooseOnMapButton.setOnClickListener { openMapPicker() }
     }
 
+    override fun onSupportNavigateUp(): Boolean {
+        finish()
+        return true
+    }
+
     private fun loadPub() {
         val id = intent.getLongExtra(EXTRA_PUB_ID, -1L)
         val pub = if (id != -1L) app.pubs.findOne(id) else null
@@ -198,66 +196,6 @@ class PubFormActivity : AppCompatActivity() {
     private fun readLongitude(): Double? =
         binding.longitudeInput.text.toString().replace(',', '.').toDoubleOrNull()?.takeIf { it in -180.0..180.0 }
 
-    override fun onSupportNavigateUp(): Boolean {
-        finish()
-        return true
-    }
-
-    companion object {
-        const val EXTRA_PUB_ID = "pub_id"
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        if (existingPub != null) {
-            menuInflater.inflate(R.menu.menu_pub_form, menu)
-        }
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val pub = existingPub ?: return super.onOptionsItemSelected(item)
-        return when (item.itemId) {
-            R.id.action_share -> {
-                sharePub(pub)
-                true
-            }
-            R.id.action_delete -> {
-                confirmDelete(pub)
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
-    private fun confirmDelete(pub: PubModel) {
-        MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.dialog_delete_title)
-            .setMessage(getString(R.string.dialog_delete_message, pub.title))
-            .setNegativeButton(R.string.button_cancel, null)
-            .setPositiveButton(R.string.button_delete) { _, _ ->
-                app.pubs.delete(pub.id)
-                Timber.i("Deleted pub: $pub")
-                finish()
-            }
-            .show()
-    }
-
-    private fun sharePub(pub: PubModel) {
-        val text = listOf(
-            pub.title,
-            pub.description,
-            pub.formattedCoordinates(this),
-            pub.formattedAmenities(this),
-            getString(R.string.format_map_link, pub.latitude.toString(), pub.longitude.toString())
-        ).filter { it.isNotEmpty() }.joinToString("\n")
-
-        val intent = Intent(Intent.ACTION_SEND)
-        intent.type = "text/plain"
-        intent.putExtra(Intent.EXTRA_TEXT, text)
-        Timber.i("Sharing pub: ${pub.title}")
-        startActivity(Intent.createChooser(intent, getString(R.string.share_chooser_title)))
-    }
-
     private fun formatCoordinate(value: Double): String =
         String.format(Locale.ROOT, "%.6f", value)
 
@@ -295,5 +233,9 @@ class PubFormActivity : AppCompatActivity() {
         }
 
         mapPicker.launch(intent)
+    }
+
+    companion object {
+        const val EXTRA_PUB_ID = "pub_id"
     }
 }

@@ -10,6 +10,7 @@ import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.pubsbarsfinder.app.databinding.ActivityPubDetailsBinding
 import com.pubsbarsfinder.app.models.PubModel
 import com.pubsbarsfinder.app.models.formattedAmenities
@@ -75,6 +76,36 @@ class PubDetailsActivity : AppCompatActivity() {
         binding.favouriteButton.setOnClickListener { toggleFavourite(pub) }
     }
 
+    private fun sharePub(pub: PubModel) {
+        val shareText = listOf(
+            pub.title,
+            pub.description,
+            pub.formattedCoordinates(this),
+            pub.formattedAmenities(this),
+            getString(R.string.format_map_link, pub.latitude.toString(), pub.longitude.toString())
+        ).filter { it.isNotEmpty() }.joinToString("\n")
+
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, shareText)
+        }
+        Timber.i("Sharing pub: ${pub.title}")
+        startActivity(Intent.createChooser(intent, null))
+    }
+
+    private fun confirmDelete(pub: PubModel) {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.dialog_delete_title)
+            .setMessage(getString(R.string.dialog_delete_message, pub.title))
+            .setNegativeButton(R.string.button_cancel, null)
+            .setPositiveButton(R.string.button_delete) { _, _ ->
+                app.pubs.delete(pub.id)
+                Timber.i("Deleted pub: $pub")
+                finish()
+            }
+            .show()
+    }
+
     private fun toggleFavourite(pub: PubModel) {
         val updatedPub = pub.copy(isFavourite = !pub.isFavourite)
         app.pubs.update(updatedPub)
@@ -88,9 +119,18 @@ class PubDetailsActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val pub = app.pubs.findOne(pubId)
         return when (item.itemId) {
             R.id.action_edit -> {
                 startActivity(Intent(this, PubFormActivity::class.java).putExtra(PubFormActivity.EXTRA_PUB_ID, pubId))
+                true
+            }
+            R.id.action_share -> {
+                pub?.let { sharePub(it) }
+                true
+            }
+            R.id.action_delete -> {
+                pub?.let { confirmDelete(it) }
                 true
             }
             else -> super.onOptionsItemSelected(item)
