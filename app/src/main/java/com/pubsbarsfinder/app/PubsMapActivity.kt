@@ -7,20 +7,25 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
+import com.pubsbarsfinder.app.adapters.PubListener
+import com.pubsbarsfinder.app.adapters.bindPub
 import com.pubsbarsfinder.app.databinding.ActivityPubsMapBinding
 import com.pubsbarsfinder.app.models.PubModel
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.overlay.CopyrightOverlay
 import org.osmdroid.views.overlay.Marker
 import timber.log.Timber
 
-class PubsMapActivity : AppCompatActivity() {
+class PubsMapActivity : AppCompatActivity(), PubListener {
 
     private lateinit var binding: ActivityPubsMapBinding
-
     private lateinit var app: MainApp
+    private var selectedPubId: Long? = null
+    private var hasZoomedToPubs = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,17 +49,6 @@ class PubsMapActivity : AppCompatActivity() {
         binding.map.setMultiTouchControls(true)
     }
 
-    override fun onResume() {
-        super.onResume()
-        binding.map.onResume()
-        showPubMarkers()
-    }
-
-    override fun onPause() {
-        binding.map.onPause()
-        super.onPause()
-    }
-
     private fun showPubMarkers() {
         val pubs = app.pubs.findAll()
         binding.map.overlays.clear()
@@ -63,23 +57,22 @@ class PubsMapActivity : AppCompatActivity() {
             val marker = Marker(binding.map).apply {
                 position = GeoPoint(pub.latitude, pub.longitude)
                 title = pub.title
-                subDescription = getString(R.string.marker_tap_again_for_details)
                 setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                setOnMarkerClickListener { clickedMarker, _ ->
-                    if (clickedMarker.isInfoWindowShown) {
-                        openPub(pub)
-                    } else {
-                        clickedMarker.showInfoWindow()
-                    }
+                setOnMarkerClickListener { _, _ ->
+                    selectPub(pub)
                     true
                 }
             }
             binding.map.overlays.add(marker)
         }
+        binding.map.overlays.add(CopyrightOverlay(this))
 
-        zoomToPubs(pubs)
-        Timber.i("Showing ${pubs.size} pubs on the map")
+        if (!hasZoomedToPubs) {
+            zoomToPubs(pubs)
+            hasZoomedToPubs = true
+        }
         binding.map.invalidate()
+        Timber.i("Showing ${pubs.size} pubs on the map")
     }
 
     private fun zoomToPubs(pubs: List<PubModel>) {
@@ -102,10 +95,57 @@ class PubsMapActivity : AppCompatActivity() {
         }
     }
 
-    private fun openPub(pub: PubModel) {
-        val intent = Intent(this, PubFormActivity::class.java)
+    private fun selectPub(pub: PubModel) {
+        selectedPubId = pub.id
+        showSelectedPub()
+        binding.map.controller.animateTo(GeoPoint(pub.latitude, pub.longitude))
+        Timber.i("Selected pub on map: ${pub.title}")
+    }
+
+    private fun showSelectedPub() {
+        val pub = selectedPubId?.let { app.pubs.findOne(it) }
+        if (pub == null) {
+            selectedPubId = null
+        } else {
+            binding.selectedPubCard.bindPub(pub, this)
+        }
+        binding.selectedPubCard.root.isVisible = pub != null
+        binding.selectPubHintText.isVisible = pub == null
+    }
+
+    override fun onPubClick(pub: PubModel) {
+        val intent = Intent(this, PubDetailsActivity::class.java)
             .putExtra(PubFormActivity.EXTRA_PUB_ID, pub.id)
         startActivity(intent)
+    }
+
+    override fun onFavouriteClick(pub: PubModel) {
+        app.pubs.update(pub.copy(isFavourite = !pub.isFavourite))
+        Timber.i("Toggled favourite for pub ${pub.id}: ${!pub.isFavourite}")
+        showSelectedPub()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        binding.map.onResume()
+        showPubMarkers()
+        showSelectedPub()
+    }
+
+    override fun onPause() {
+        binding.map.onPause()
+        super.onPause()
+    }
+
+    override fun onDestroy() {
+        binding.map.onDetach()
+        super.onDestroy()
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        binding.map.tileProvider.clearTileCache()
+        binding.map.invalidate()
     }
 
     override fun onSupportNavigateUp(): Boolean {

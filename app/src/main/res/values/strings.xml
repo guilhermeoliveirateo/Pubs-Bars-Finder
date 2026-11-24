@@ -24,6 +24,7 @@
     <string name="hint_latitude_input">53.3448</string>
     <string name="hint_longitude_input">-6.2765</string>
     <string name="hint_coordinate_ranges">Latitude between -90 and 90, longitude between -180 and 180.</string>
+    <string name="hint_select_pub_on_map">Tap a pub on the map to see it here</string>
     <string name="empty_list_state_text">No pubs yet. Tap Add pub to save your first one.</string>
     <string name="empty_list_state_delete_all_text">There are no pubs to delete.</string>
     <string name="empty_state_no_search_results">No pubs match your search/filter.</string>
@@ -68,7 +69,6 @@
     <string name="amenity_pet_friendly">Pet friendly</string>
     <string name="separator_amenities">" · "</string>
     <string name="marker_selected_location">Selected location</string>
-    <string name="marker_tap_again_for_details">Tap again for details</string>
     <string name="format_coordinates">%1$.4f° %2$s, %3$.4f° %4$s</string>
     <string name="format_filter">Filtered by: %1$s</string>
     <string name="direction_north">N</string>
