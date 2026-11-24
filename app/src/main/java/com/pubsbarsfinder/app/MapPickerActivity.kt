@@ -11,6 +11,7 @@ import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.overlay.CopyrightOverlay
 import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
 import timber.log.Timber
@@ -63,6 +64,8 @@ class MapPickerActivity : AppCompatActivity() {
             override fun longPressHelper(point: GeoPoint): Boolean = false
         }
         binding.map.overlays.add(0, MapEventsOverlay(tapReceiver))
+
+        binding.map.overlays.add(CopyrightOverlay(this))
     }
 
     private fun setSelectedLocation(location: GeoPoint) {
@@ -102,6 +105,17 @@ class MapPickerActivity : AppCompatActivity() {
     override fun onPause() {
         binding.map.onPause()
         super.onPause()
+    }
+
+    override fun onDestroy() {
+        binding.map.onDetach()
+        super.onDestroy()
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        binding.map.tileProvider.clearTileCache()
+        binding.map.invalidate()
     }
 
     override fun onSupportNavigateUp(): Boolean {
