@@ -1,4 +1,4 @@
-package com.pubsbarsfinder.app
+package com.pubsbarsfinder.app.views
 
 import android.content.Intent
 import android.os.Bundle
@@ -13,6 +13,8 @@ import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.pubsbarsfinder.app.MainApp
+import com.pubsbarsfinder.app.R
 import com.pubsbarsfinder.app.adapters.PubAdapter
 import com.pubsbarsfinder.app.adapters.PubListener
 import com.pubsbarsfinder.app.databinding.ActivityMainBinding

@@ -1,4 +1,4 @@
-package com.pubsbarsfinder.app
+package com.pubsbarsfinder.app.views
 
 import android.content.Intent
 import android.os.Bundle
@@ -16,6 +16,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
+import com.pubsbarsfinder.app.MainApp
+import com.pubsbarsfinder.app.R
 import com.pubsbarsfinder.app.databinding.ActivityPubFormBinding
 import com.pubsbarsfinder.app.models.Amenity
 import com.pubsbarsfinder.app.models.PubModel

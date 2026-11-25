@@ -1,4 +1,4 @@
-package com.pubsbarsfinder.app
+package com.pubsbarsfinder.app.views
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,6 +6,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.pubsbarsfinder.app.R
 import com.pubsbarsfinder.app.databinding.ActivityMapPickerBinding
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapEventsReceiver

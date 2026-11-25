@@ -1,4 +1,4 @@
-package com.pubsbarsfinder.app
+package com.pubsbarsfinder.app.views
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -12,6 +12,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.pubsbarsfinder.app.MainApp
+import com.pubsbarsfinder.app.R
 import com.pubsbarsfinder.app.databinding.ActivityPubDetailsBinding
 import com.pubsbarsfinder.app.models.PubModel
 import com.pubsbarsfinder.app.models.formattedAmenities
