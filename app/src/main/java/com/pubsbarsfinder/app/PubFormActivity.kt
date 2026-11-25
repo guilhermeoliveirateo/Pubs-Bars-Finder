@@ -1,7 +1,6 @@
 package com.pubsbarsfinder.app
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.CheckBox
@@ -11,8 +10,8 @@ import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import java.util.Locale
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -20,19 +19,15 @@ import androidx.core.widget.doAfterTextChanged
 import com.pubsbarsfinder.app.databinding.ActivityPubFormBinding
 import com.pubsbarsfinder.app.models.Amenity
 import com.pubsbarsfinder.app.models.PubModel
-import androidx.core.net.toUri
+import com.pubsbarsfinder.app.presenters.PubFormPresenter
+import com.pubsbarsfinder.app.presenters.PubFormView
 import timber.log.Timber
+import java.util.Locale
 
-class PubFormActivity : AppCompatActivity() {
+class PubFormActivity : AppCompatActivity(), PubFormView {
 
     private lateinit var binding: ActivityPubFormBinding
-    private var existingPub: PubModel? = null
-
-    private var hasTriedToSave = false
-
-    private var selectedImageUri: Uri? = null
-
-    private lateinit var app: MainApp
+    private lateinit var presenter: PubFormPresenter
 
     private val amenityCheckBoxes: Map<Amenity, CheckBox> by lazy {
         mapOf(
@@ -50,27 +45,24 @@ class PubFormActivity : AppCompatActivity() {
             try {
                 contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
             } catch (_: SecurityException) {
+                Timber.w("Could not keep access to photo: $uri")
             }
-            selectedImageUri = uri
-            Timber.i("Photo chosen: $uri")
-            showSelectedPhoto()
+            presenter.onPhotoChosen(uri.toString())
         }
     }
 
     private val mapPicker = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         val data = result.data
         if (result.resultCode == RESULT_OK && data != null) {
-            val latitude = data.getDoubleExtra(MapPickerActivity.EXTRA_LATITUDE, 0.0)
-            val longitude = data.getDoubleExtra(MapPickerActivity.EXTRA_LONGITUDE, 0.0)
-            Timber.i("Location chosen on map: $latitude, $longitude")
-            binding.latitudeInput.setText(formatCoordinate(latitude))
-            binding.longitudeInput.setText(formatCoordinate(longitude))
+            presenter.onLocationChosen(
+                data.getDoubleExtra(MapPickerActivity.EXTRA_LATITUDE, 0.0),
+                data.getDoubleExtra(MapPickerActivity.EXTRA_LONGITUDE, 0.0)
+            )
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        app = application as MainApp
         enableEdgeToEdge()
         binding = ActivityPubFormBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -82,42 +74,31 @@ class PubFormActivity : AppCompatActivity() {
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        loadPub()
+        val pubId = intent.getLongExtra(EXTRA_PUB_ID, -1L).takeIf { it != -1L }
+        presenter = PubFormPresenter(this, (application as MainApp).pubs, pubId)
+        presenter.onCreate()
 
-        binding.cancelButton.setOnClickListener {
-            finish()
-        }
+        binding.cancelButton.setOnClickListener { presenter.onCancelClicked() }
         binding.saveButton.setOnClickListener {
-            savePub()
+            presenter.onSaveClicked(
+                titleText(),
+                binding.descriptionInput.text.toString(),
+                latitudeText(),
+                longitudeText(),
+                amenityCheckBoxes.filterValues { it.isChecked }.keys,
+                binding.favouriteCheckBox.isChecked
+            )
         }
 
-        binding.titleInput.doAfterTextChanged {
-            if (hasTriedToSave) {
-                showFieldError(binding.titleInput, binding.titleLabel, binding.titleError, hasError = readTitle().isEmpty())
-            }
-        }
-        binding.latitudeInput.doAfterTextChanged {
-            if (hasTriedToSave) {
-                showFieldError(binding.latitudeInput, binding.latitudeLabel, binding.latitudeError, hasError = readLatitude() == null)
-            }
-        }
-        binding.longitudeInput.doAfterTextChanged {
-            if (hasTriedToSave) {
-                showFieldError(binding.longitudeInput, binding.longitudeLabel, binding.longitudeError, hasError = readLongitude() == null)
-            }
-        }
+        binding.titleInput.doAfterTextChanged { onInputChanged() }
+        binding.latitudeInput.doAfterTextChanged { onInputChanged() }
+        binding.longitudeInput.doAfterTextChanged { onInputChanged() }
 
-        binding.choosePhotoButton.setOnClickListener {
-            imagePicker.launch(arrayOf("image/*"))
+        binding.choosePhotoButton.setOnClickListener { presenter.onChoosePhotoClicked() }
+        binding.removePhotoButton.setOnClickListener { presenter.onRemovePhotoClicked() }
+        binding.chooseOnMapButton.setOnClickListener {
+            presenter.onChooseOnMapClicked(titleText(), latitudeText(), longitudeText())
         }
-
-        binding.removePhotoButton.setOnClickListener {
-            selectedImageUri = null
-            Timber.i("Photo removed")
-            showSelectedPhoto()
-        }
-
-        binding.chooseOnMapButton.setOnClickListener { openMapPicker() }
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -125,82 +106,24 @@ class PubFormActivity : AppCompatActivity() {
         return true
     }
 
-    private fun loadPub() {
-        val id = intent.getLongExtra(EXTRA_PUB_ID, -1L)
-        val pub = if (id != -1L) app.pubs.findOne(id) else null
-        existingPub = pub
-        selectedImageUri = pub?.imageUri?.toUri()
-
-        if (pub != null) {
-            binding.titleInput.setText(pub.title)
-            binding.descriptionInput.setText(pub.description)
-            binding.latitudeInput.setText(pub.latitude.toString())
-            binding.longitudeInput.setText(pub.longitude.toString())
-            binding.favouriteCheckBox.isChecked = pub.isFavourite
-            amenityCheckBoxes.forEach { (amenity, checkBox) ->
-                if (amenity in pub.amenities) {
-                    checkBox.isChecked = true
-                }
-            }
-            title = getString(R.string.screen_edit_pub)
-            binding.saveButton.setText(R.string.button_save_changes)
-        } else {
-            title = getString(R.string.screen_new_pub)
+    override fun showPub(pub: PubModel) {
+        binding.titleInput.setText(pub.title)
+        binding.descriptionInput.setText(pub.description)
+        binding.latitudeInput.setText(pub.latitude.toString())
+        binding.longitudeInput.setText(pub.longitude.toString())
+        binding.favouriteCheckBox.isChecked = pub.isFavourite
+        amenityCheckBoxes.forEach { (amenity, checkBox) ->
+            checkBox.isChecked = amenity in pub.amenities
         }
-        showSelectedPhoto()
     }
 
-    private fun savePub() {
-        hasTriedToSave = true
-
-        val title = readTitle()
-        val description = binding.descriptionInput.text.toString().trim()
-        val latitude = readLatitude()
-        val longitude = readLongitude()
-        val amenities = amenityCheckBoxes.filterValues { it.isChecked }.keys
-        val isFavourite = binding.favouriteCheckBox.isChecked
-        val imageUri = selectedImageUri?.toString()
-
-        showFieldError(input = binding.titleInput, label = binding.titleLabel, error = binding.titleError, hasError = title.isEmpty())
-
-        showFieldError(input = binding.latitudeInput, label = binding.latitudeLabel, error = binding.latitudeError, hasError = (latitude == null))
-
-        showFieldError(input = binding.longitudeInput, label = binding.longitudeLabel, error = binding.longitudeError, hasError = (longitude == null))
-
-        if (title.isEmpty() || latitude == null || longitude == null) return
-
-        val pub = existingPub
-        if (pub == null) {
-            val newPub = app.pubs.create(PubModel(title = title, description = description, latitude = latitude, longitude = longitude, amenities = amenities, isFavourite = isFavourite, imageUri = imageUri))
-            Timber.i("Created pub: $newPub")
-        } else {
-            val updatedPub = pub.copy(title = title, description = description, latitude = latitude, longitude = longitude, amenities = amenities, isFavourite = isFavourite, imageUri = imageUri)
-            app.pubs.update(updatedPub)
-            Timber.i("Updated pub: $updatedPub")
-        }
-        finish()
+    override fun setEditMode(isEditing: Boolean) {
+        title = getString(if (isEditing) R.string.screen_edit_pub else R.string.screen_new_pub)
+        binding.saveButton.setText(if (isEditing) R.string.button_save_changes else R.string.button_save_pub)
     }
 
-    private fun showFieldError(input: EditText, label: TextView, error: TextView, hasError: Boolean) {
-        error.visibility = if (hasError) View.VISIBLE else View.GONE
-        input.setBackgroundResource(if (hasError) R.drawable.bg_field_error else R.drawable.bg_field)
-        label.setTextColor(ContextCompat.getColor(this, if (hasError) R.color.error else R.color.text_label))
-    }
-
-    private fun readTitle(): String =
-        binding.titleInput.text.toString().trim()
-
-    private fun readLatitude(): Double? =
-        binding.latitudeInput.text.toString().replace(',', '.').toDoubleOrNull()?.takeIf { it in -90.0..90.0 }
-
-    private fun readLongitude(): Double? =
-        binding.longitudeInput.text.toString().replace(',', '.').toDoubleOrNull()?.takeIf { it in -180.0..180.0 }
-
-    private fun formatCoordinate(value: Double): String =
-        String.format(Locale.ROOT, "%.6f", value)
-
-    private fun showSelectedPhoto() {
-        val uri = selectedImageUri
+    override fun showPhoto(imageUri: String?) {
+        val uri = imageUri?.toUri()
         if (uri != null) {
             binding.photoPreview.setImageURI(uri)
             binding.photoPreview.scaleType = ImageView.ScaleType.CENTER_CROP
@@ -217,23 +140,53 @@ class PubFormActivity : AppCompatActivity() {
         binding.removePhotoButton.isVisible = uri != null
     }
 
-    private fun openMapPicker() {
-        val intent = Intent(this, MapPickerActivity::class.java)
+    override fun showFieldErrors(titleError: Boolean, latitudeError: Boolean, longitudeError: Boolean) {
+        showFieldError(binding.titleInput, binding.titleLabel, binding.titleError, titleError)
+        showFieldError(binding.latitudeInput, binding.latitudeLabel, binding.latitudeError, latitudeError)
+        showFieldError(binding.longitudeInput, binding.longitudeLabel, binding.longitudeError, longitudeError)
+    }
 
-        val latitude = readLatitude()
-        val longitude = readLongitude()
+    override fun openImagePicker() {
+        imagePicker.launch(arrayOf("image/*"))
+    }
+
+    override fun openMapPicker(latitude: Double?, longitude: Double?, title: String) {
+        val intent = Intent(this, MapPickerActivity::class.java)
         if (latitude != null && longitude != null) {
             intent.putExtra(MapPickerActivity.EXTRA_LATITUDE, latitude)
             intent.putExtra(MapPickerActivity.EXTRA_LONGITUDE, longitude)
         }
-
-        val title = readTitle()
         if (title.isNotEmpty()) {
             intent.putExtra(MapPickerActivity.EXTRA_TITLE, title)
         }
-
         mapPicker.launch(intent)
     }
+
+    override fun showCoordinates(latitude: Double, longitude: Double) {
+        binding.latitudeInput.setText(formatCoordinate(latitude))
+        binding.longitudeInput.setText(formatCoordinate(longitude))
+    }
+
+    override fun close() = finish()
+
+    private fun onInputChanged() {
+        presenter.onInputChanged(titleText(), latitudeText(), longitudeText())
+    }
+
+    private fun titleText() = binding.titleInput.text.toString()
+
+    private fun latitudeText() = binding.latitudeInput.text.toString()
+
+    private fun longitudeText() = binding.longitudeInput.text.toString()
+
+    private fun showFieldError(input: EditText, label: TextView, error: TextView, hasError: Boolean) {
+        error.visibility = if (hasError) View.VISIBLE else View.GONE
+        input.setBackgroundResource(if (hasError) R.drawable.bg_field_error else R.drawable.bg_field)
+        label.setTextColor(ContextCompat.getColor(this, if (hasError) R.color.error else R.color.text_label))
+    }
+
+    private fun formatCoordinate(value: Double): String =
+        String.format(Locale.ROOT, "%.6f", value)
 
     companion object {
         const val EXTRA_PUB_ID = "pub_id"
