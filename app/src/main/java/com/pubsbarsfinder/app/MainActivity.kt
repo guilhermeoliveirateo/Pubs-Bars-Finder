@@ -19,22 +19,19 @@ import com.pubsbarsfinder.app.databinding.ActivityMainBinding
 import com.pubsbarsfinder.app.models.Amenity
 import com.pubsbarsfinder.app.models.PubModel
 import com.pubsbarsfinder.app.models.labelRes
-import timber.log.Timber
+import com.pubsbarsfinder.app.presenters.EmptyState
+import com.pubsbarsfinder.app.presenters.PubListPresenter
+import com.pubsbarsfinder.app.presenters.PubListView
 
-class MainActivity : AppCompatActivity(), PubListener {
+class MainActivity : AppCompatActivity(), PubListView, PubListener {
 
     private lateinit var binding: ActivityMainBinding
-
-    private var favouritesOnly: Boolean = false
-    private var selectedAmenities: Set<Amenity> = emptySet()
+    private lateinit var presenter: PubListPresenter
 
     private val pubAdapter = PubAdapter(emptyList(), this)
 
-    private lateinit var app: MainApp
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        app = application as MainApp
         enableEdgeToEdge()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -45,33 +42,18 @@ class MainActivity : AppCompatActivity(), PubListener {
             insets
         }
 
-        binding.addPubButton.setOnClickListener {
-            startActivity(Intent(this, PubFormActivity::class.java))
-        }
-
-        binding.searchInput.doAfterTextChanged {
-            showPubs()
-        }
+        presenter = PubListPresenter(this, (application as MainApp).pubs)
 
         binding.pubList.layoutManager = LinearLayoutManager(this)
         binding.pubList.adapter = pubAdapter
+
+        binding.addPubButton.setOnClickListener { presenter.onAddPubClicked() }
+        binding.searchInput.doAfterTextChanged { presenter.onSearchChanged(it.toString()) }
     }
 
     override fun onResume() {
         super.onResume()
-        showPubs()
-    }
-
-    override fun onPubClick(pub: PubModel) {
-        val intent = Intent(this, PubDetailsActivity::class.java)
-            .putExtra(PubFormActivity.EXTRA_PUB_ID, pub.id)
-        startActivity(intent)
-    }
-
-    override fun onFavouriteClick(pub: PubModel) {
-        app.pubs.update(pub.copy(isFavourite = !pub.isFavourite))
-        Timber.i("Toggled favourite for pub ${pub.id}: ${!pub.isFavourite}")
-        showPubs()
+        presenter.onResume()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -82,29 +64,56 @@ class MainActivity : AppCompatActivity(), PubListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_filter -> {
-                showFilterDialog()
+                presenter.onFilterClicked()
                 true
             }
             R.id.action_delete_all -> {
-                confirmDeleteAll()
+                presenter.onDeleteAllClicked()
                 true
             }
             R.id.action_show_map -> {
-                startActivity(Intent(this, PubsMapActivity::class.java))
+                presenter.onShowMapClicked()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
 
-    private fun showFilterDialog() {
-        val amenities = Amenity.entries
+    override fun onPubClick(pub: PubModel) = presenter.onPubClicked(pub)
+
+    override fun onFavouriteClick(pub: PubModel) = presenter.onFavouriteClicked(pub)
+
+    override fun showPubs(pubs: List<PubModel>) = pubAdapter.updatePubs(pubs)
+
+    override fun showEmptyState(state: EmptyState) {
+        binding.emptyStateText.isVisible = state != EmptyState.NONE
+        when (state) {
+            EmptyState.NO_PUBS -> binding.emptyStateText.setText(R.string.empty_list_state_text)
+            EmptyState.NO_MATCHES -> binding.emptyStateText.setText(R.string.empty_state_no_search_results)
+            EmptyState.NONE -> Unit
+        }
+    }
+
+    override fun showActiveFilters(favouritesOnly: Boolean, amenities: Set<Amenity>) {
+        val activeFilters = buildList {
+            if (favouritesOnly) add(getString(R.string.filter_favourites_only))
+            amenities.forEach { add(getString(it.labelRes())) }
+        }
+        binding.activeFiltersText.text = getString(
+            R.string.format_filter,
+            activeFilters.joinToString(getString(R.string.separator_amenities))
+        )
+        binding.activeFiltersText.isVisible = activeFilters.isNotEmpty()
+    }
+
+    override fun showFilterDialog(favouritesOnly: Boolean, amenities: Set<Amenity>) {
+        val allAmenities = Amenity.entries
 
         val labels = (listOf(getString(R.string.filter_favourites_only)) +
-                amenities.map { getString(it.labelRes()) }).toTypedArray()
+                allAmenities.map { getString(it.labelRes()) }).toTypedArray()
 
         val checked = (listOf(favouritesOnly) +
-                amenities.map { it in selectedAmenities }).toBooleanArray()
+                allAmenities.map { it in amenities }).toBooleanArray()
 
         MaterialAlertDialogBuilder(this)
             .setTitle(R.string.action_filter)
@@ -112,61 +121,40 @@ class MainActivity : AppCompatActivity(), PubListener {
                 checked[which] = isChecked
             }
             .setPositiveButton(R.string.button_apply) { _, _ ->
-                favouritesOnly = checked[0]
-                selectedAmenities = amenities.filterIndexed { index, _ -> checked[index + 1] }.toSet()
-                Timber.i("Filters applied: favouritesOnly=$favouritesOnly, amenities=$selectedAmenities")
-                showPubs()
+                presenter.onFiltersApplied(
+                    checked[0],
+                    allAmenities.filterIndexed { index, _ -> checked[index + 1] }.toSet()
+                )
             }
-            .setNeutralButton(R.string.button_clear) { _, _ ->
-                favouritesOnly = false
-                selectedAmenities = emptySet()
-                Timber.i("Filters cleared")
-                showPubs()
-            }
+            .setNeutralButton(R.string.button_clear) { _, _ -> presenter.onFiltersCleared() }
             .setNegativeButton(R.string.button_cancel, null)
             .show()
     }
 
-    private fun confirmDeleteAll() {
-        val size = app.pubs.findAll().size
-        if (size == 0) {
-            Toast.makeText(this, R.string.empty_list_state_delete_all_text, Toast.LENGTH_SHORT).show()
-        } else {
-            MaterialAlertDialogBuilder(this)
-                .setTitle(R.string.dialog_delete_all_title)
-                .setMessage(getString(R.string.dialog_delete_all_message, size))
-                .setNegativeButton(R.string.button_cancel, null)
-                .setPositiveButton(R.string.button_delete_all) { _, _ ->
-                    app.pubs.deleteAll()
-                    Timber.i("Deleted all $size pubs")
-                    showPubs()
-                }
-                .show()
-        }
+    override fun showDeleteAllConfirmation(count: Int) {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.dialog_delete_all_title)
+            .setMessage(getString(R.string.dialog_delete_all_message, count))
+            .setNegativeButton(R.string.button_cancel, null)
+            .setPositiveButton(R.string.button_delete_all) { _, _ -> presenter.onDeleteAllConfirmed() }
+            .show()
     }
 
-    private fun showPubs() {
-        val query = binding.searchInput.text.toString().trim()
-        val allPubs = app.pubs.findAll()
-        val pubs = allPubs.filter { it.title.contains(query, ignoreCase = true) && (!favouritesOnly || it.isFavourite) && it.amenities.containsAll(selectedAmenities) }
+    override fun showNoPubsToDelete() {
+        Toast.makeText(this, R.string.empty_list_state_delete_all_text, Toast.LENGTH_SHORT).show()
+    }
 
-        pubAdapter.updatePubs(pubs)
+    override fun openPubDetails(pubId: Long) {
+        val intent = Intent(this, PubDetailsActivity::class.java)
+            .putExtra(PubFormActivity.EXTRA_PUB_ID, pubId)
+        startActivity(intent)
+    }
 
-        val activeFilters = buildList {
-            if (favouritesOnly) add(getString(R.string.filter_favourites_only))
-            selectedAmenities.forEach { add(getString(it.labelRes())) }
-        }
+    override fun openNewPubForm() {
+        startActivity(Intent(this, PubFormActivity::class.java))
+    }
 
-        binding.activeFiltersText.text = getString(
-            R.string.format_filter,
-            activeFilters.joinToString(getString(R.string.separator_amenities))
-        )
-
-        binding.activeFiltersText.isVisible = activeFilters.isNotEmpty()
-
-        binding.emptyStateText.isVisible = pubs.isEmpty()
-        binding.emptyStateText.setText(
-            if (allPubs.isEmpty()) R.string.empty_list_state_text else R.string.empty_state_no_search_results
-        )
+    override fun openPubsMap() {
+        startActivity(Intent(this, PubsMapActivity::class.java))
     }
 }
