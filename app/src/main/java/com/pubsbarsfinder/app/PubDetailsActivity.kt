@@ -16,28 +16,27 @@ import com.pubsbarsfinder.app.databinding.ActivityPubDetailsBinding
 import com.pubsbarsfinder.app.models.PubModel
 import com.pubsbarsfinder.app.models.formattedAmenities
 import com.pubsbarsfinder.app.models.formattedCoordinates
+import com.pubsbarsfinder.app.presenters.PubDetailsPresenter
+import com.pubsbarsfinder.app.presenters.PubDetailsView
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.overlay.CopyrightOverlay
 import org.osmdroid.views.overlay.Marker
-import timber.log.Timber
 
-class PubDetailsActivity : AppCompatActivity() {
+class PubDetailsActivity : AppCompatActivity(), PubDetailsView {
 
     private lateinit var binding: ActivityPubDetailsBinding
-    private lateinit var app: MainApp
-    private var pubId: Long = -1L
+    private lateinit var presenter: PubDetailsPresenter
 
     private var locationMarker: Marker? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        app = application as MainApp
+        Configuration.getInstance().userAgentValue = packageName
         enableEdgeToEdge()
         binding = ActivityPubDetailsBinding.inflate(layoutInflater)
-        Configuration.getInstance().userAgentValue = packageName
         setContentView(binding.root)
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { view, insets ->
@@ -48,7 +47,11 @@ class PubDetailsActivity : AppCompatActivity() {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         title = getString(R.string.screen_pub_details)
-        pubId = intent.getLongExtra(PubFormActivity.EXTRA_PUB_ID, -1L)
+
+        val pubId = intent.getLongExtra(PubFormActivity.EXTRA_PUB_ID, -1L)
+        presenter = PubDetailsPresenter(this, (application as MainApp).pubs, pubId)
+
+        binding.favouriteButton.setOnClickListener { presenter.onFavouriteClicked() }
 
         setUpLocationMap()
     }
@@ -56,13 +59,7 @@ class PubDetailsActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         binding.locationMap.onResume()
-        val pub = app.pubs.findOne(pubId)
-        if (pub == null) {
-            Timber.i("Pub $pubId not found, closing details")
-            finish()
-        } else {
-            showPub(pub)
-        }
+        presenter.onResume()
     }
 
     override fun onPause() {
@@ -87,18 +84,17 @@ class PubDetailsActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val pub = app.pubs.findOne(pubId)
         return when (item.itemId) {
             R.id.action_edit -> {
-                startActivity(Intent(this, PubFormActivity::class.java).putExtra(PubFormActivity.EXTRA_PUB_ID, pubId))
+                presenter.onEditClicked()
                 true
             }
             R.id.action_share -> {
-                pub?.let { sharePub(it) }
+                presenter.onShareClicked()
                 true
             }
             R.id.action_delete -> {
-                pub?.let { confirmDelete(it) }
+                presenter.onDeleteClicked()
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -110,7 +106,7 @@ class PubDetailsActivity : AppCompatActivity() {
         return true
     }
 
-    private fun showPub(pub: PubModel) {
+    override fun showPub(pub: PubModel) {
         title = pub.title
         binding.titleText.text = pub.title
         binding.descriptionText.text = pub.description.ifEmpty { getString(R.string.details_no_description) }
@@ -131,12 +127,15 @@ class PubDetailsActivity : AppCompatActivity() {
             if (pub.isFavourite) R.string.content_description_remove_favourite else R.string.content_description_add_favourite
         binding.favouriteButton.setImageResource(favouriteIcon)
         binding.favouriteButton.contentDescription = getString(favouriteDescription)
-        binding.favouriteButton.setOnClickListener { toggleFavourite(pub) }
 
         showLocation(pub)
     }
 
-    private fun sharePub(pub: PubModel) {
+    override fun openEditForm(pubId: Long) {
+        startActivity(Intent(this, PubFormActivity::class.java).putExtra(PubFormActivity.EXTRA_PUB_ID, pubId))
+    }
+
+    override fun sharePub(pub: PubModel) {
         val shareText = listOf(
             pub.title,
             pub.description,
@@ -149,29 +148,19 @@ class PubDetailsActivity : AppCompatActivity() {
             type = "text/plain"
             putExtra(Intent.EXTRA_TEXT, shareText)
         }
-        Timber.i("Sharing pub: ${pub.title}")
         startActivity(Intent.createChooser(intent, null))
     }
 
-    private fun confirmDelete(pub: PubModel) {
+    override fun showDeleteConfirmation(pub: PubModel) {
         MaterialAlertDialogBuilder(this)
             .setTitle(R.string.dialog_delete_title)
             .setMessage(getString(R.string.dialog_delete_message, pub.title))
             .setNegativeButton(R.string.button_cancel, null)
-            .setPositiveButton(R.string.button_delete) { _, _ ->
-                app.pubs.delete(pub.id)
-                Timber.i("Deleted pub: $pub")
-                finish()
-            }
+            .setPositiveButton(R.string.button_delete) { _, _ -> presenter.onDeleteConfirmed() }
             .show()
     }
 
-    private fun toggleFavourite(pub: PubModel) {
-        val updatedPub = pub.copy(isFavourite = !pub.isFavourite)
-        app.pubs.update(updatedPub)
-        Timber.i("Toggled favourite for pub ${pub.id}: ${updatedPub.isFavourite}")
-        showPub(updatedPub)
-    }
+    override fun close() = finish()
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setUpLocationMap() {
