@@ -12,24 +12,22 @@ import com.pubsbarsfinder.app.adapters.PubListener
 import com.pubsbarsfinder.app.adapters.bindPub
 import com.pubsbarsfinder.app.databinding.ActivityPubsMapBinding
 import com.pubsbarsfinder.app.models.PubModel
+import com.pubsbarsfinder.app.presenters.PubsMapPresenter
+import com.pubsbarsfinder.app.presenters.PubsMapView
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.CopyrightOverlay
 import org.osmdroid.views.overlay.Marker
-import timber.log.Timber
 
-class PubsMapActivity : AppCompatActivity(), PubListener {
+class PubsMapActivity : AppCompatActivity(), PubsMapView, PubListener {
 
     private lateinit var binding: ActivityPubsMapBinding
-    private lateinit var app: MainApp
-    private var selectedPubId: Long? = null
-    private var hasZoomedToPubs = false
+    private lateinit var presenter: PubsMapPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        app = application as MainApp
         Configuration.getInstance().userAgentValue = packageName
 
         enableEdgeToEdge()
@@ -47,89 +45,14 @@ class PubsMapActivity : AppCompatActivity(), PubListener {
 
         binding.map.setTileSource(TileSourceFactory.MAPNIK)
         binding.map.setMultiTouchControls(true)
-    }
 
-    private fun showPubMarkers() {
-        val pubs = app.pubs.findAll()
-        binding.map.overlays.clear()
-
-        pubs.forEach { pub ->
-            val marker = Marker(binding.map).apply {
-                position = GeoPoint(pub.latitude, pub.longitude)
-                title = pub.title
-                setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                setOnMarkerClickListener { _, _ ->
-                    selectPub(pub)
-                    true
-                }
-            }
-            binding.map.overlays.add(marker)
-        }
-        binding.map.overlays.add(CopyrightOverlay(this))
-
-        if (!hasZoomedToPubs) {
-            zoomToPubs(pubs)
-            hasZoomedToPubs = true
-        }
-        binding.map.invalidate()
-        Timber.i("Showing ${pubs.size} pubs on the map")
-    }
-
-    private fun zoomToPubs(pubs: List<PubModel>) {
-        val points = pubs.map { GeoPoint(it.latitude, it.longitude) }
-        val controller = binding.map.controller
-
-        when (points.size) {
-            0 -> {
-                controller.setZoom(MapPickerActivity.DEFAULT_ZOOM)
-                controller.setCenter(GeoPoint(MapPickerActivity.DEFAULT_LATITUDE, MapPickerActivity.DEFAULT_LONGITUDE))
-                Toast.makeText(this, R.string.message_no_pubs_on_map, Toast.LENGTH_SHORT).show()
-            }
-            1 -> {
-                controller.setZoom(MapPickerActivity.DEFAULT_ZOOM)
-                controller.setCenter(points.first())
-            }
-            else -> binding.map.post {
-                binding.map.zoomToBoundingBox(BoundingBox.fromGeoPoints(points), false, 100)
-            }
-        }
-    }
-
-    private fun selectPub(pub: PubModel) {
-        selectedPubId = pub.id
-        showSelectedPub()
-        binding.map.controller.animateTo(GeoPoint(pub.latitude, pub.longitude))
-        Timber.i("Selected pub on map: ${pub.title}")
-    }
-
-    private fun showSelectedPub() {
-        val pub = selectedPubId?.let { app.pubs.findOne(it) }
-        if (pub == null) {
-            selectedPubId = null
-        } else {
-            binding.selectedPubCard.bindPub(pub, this)
-        }
-        binding.selectedPubCard.root.isVisible = pub != null
-        binding.selectPubHintText.isVisible = pub == null
-    }
-
-    override fun onPubClick(pub: PubModel) {
-        val intent = Intent(this, PubDetailsActivity::class.java)
-            .putExtra(PubFormActivity.EXTRA_PUB_ID, pub.id)
-        startActivity(intent)
-    }
-
-    override fun onFavouriteClick(pub: PubModel) {
-        app.pubs.update(pub.copy(isFavourite = !pub.isFavourite))
-        Timber.i("Toggled favourite for pub ${pub.id}: ${!pub.isFavourite}")
-        showSelectedPub()
+        presenter = PubsMapPresenter(this, (application as MainApp).pubs)
     }
 
     override fun onResume() {
         super.onResume()
         binding.map.onResume()
-        showPubMarkers()
-        showSelectedPub()
+        presenter.onResume()
     }
 
     override fun onPause() {
@@ -151,5 +74,70 @@ class PubsMapActivity : AppCompatActivity(), PubListener {
     override fun onSupportNavigateUp(): Boolean {
         finish()
         return true
+    }
+
+    // PubListener: taps on the selected pub's card
+
+    override fun onPubClick(pub: PubModel) = presenter.onCardClicked(pub)
+
+    override fun onFavouriteClick(pub: PubModel) = presenter.onFavouriteClicked(pub)
+
+    // PubsMapView: what the presenter asks the screen to show or do
+
+    override fun showMarkers(pubs: List<PubModel>) {
+        binding.map.overlays.clear()
+
+        pubs.forEach { pub ->
+            val marker = Marker(binding.map).apply {
+                position = GeoPoint(pub.latitude, pub.longitude)
+                title = pub.title
+                setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                setOnMarkerClickListener { _, _ ->
+                    presenter.onMarkerClicked(pub)
+                    true
+                }
+            }
+            binding.map.overlays.add(marker)
+        }
+        binding.map.overlays.add(CopyrightOverlay(this))
+        binding.map.invalidate()
+    }
+
+    override fun zoomToPubs(pubs: List<PubModel>) {
+        val points = pubs.map { GeoPoint(it.latitude, it.longitude) }
+        val controller = binding.map.controller
+
+        when (points.size) {
+            0 -> {
+                controller.setZoom(MapPickerActivity.DEFAULT_ZOOM)
+                controller.setCenter(GeoPoint(MapPickerActivity.DEFAULT_LATITUDE, MapPickerActivity.DEFAULT_LONGITUDE))
+                Toast.makeText(this, R.string.message_no_pubs_on_map, Toast.LENGTH_SHORT).show()
+            }
+            1 -> {
+                controller.setZoom(MapPickerActivity.DEFAULT_ZOOM)
+                controller.setCenter(points.first())
+            }
+            else -> binding.map.post {
+                binding.map.zoomToBoundingBox(BoundingBox.fromGeoPoints(points), false, 100)
+            }
+        }
+    }
+
+    override fun moveToPub(pub: PubModel) {
+        binding.map.controller.animateTo(GeoPoint(pub.latitude, pub.longitude))
+    }
+
+    override fun showSelectedPub(pub: PubModel?) {
+        if (pub != null) {
+            binding.selectedPubCard.bindPub(pub, this)
+        }
+        binding.selectedPubCard.root.isVisible = pub != null
+        binding.selectPubHintText.isVisible = pub == null
+    }
+
+    override fun openPubDetails(pubId: Long) {
+        val intent = Intent(this, PubDetailsActivity::class.java)
+            .putExtra(PubFormActivity.EXTRA_PUB_ID, pubId)
+        startActivity(intent)
     }
 }
