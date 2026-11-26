@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/screen_background"
     android:orientation="vertical"
-    tools:context=".MapPickerActivity">
+    tools:context=".views.MapPickerActivity">
 
     <org.osmdroid.views.MapView
         android:id="@+id/map"

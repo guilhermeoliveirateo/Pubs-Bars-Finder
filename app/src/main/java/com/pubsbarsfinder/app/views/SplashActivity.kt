@@ -1,7 +1,8 @@
-package com.pubsbarsfinder.app
+package com.pubsbarsfinder.app.views
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.os.Looper
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -10,7 +11,7 @@ import com.pubsbarsfinder.app.databinding.ActivitySplashBinding
 class SplashActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySplashBinding
-    private val handler = android.os.Handler(Looper.getMainLooper())
+    private val handler = Handler(Looper.getMainLooper())
     private val openMainScreen = Runnable {
         startActivity(Intent(this, MainActivity::class.java))
         finish()

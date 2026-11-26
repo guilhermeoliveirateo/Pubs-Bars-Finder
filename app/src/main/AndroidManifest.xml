@@ -14,16 +14,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PubsBarsFinder">
         <activity
-            android:name=".PubDetailsActivity"
+            android:name=".views.PubDetailsActivity"
             android:exported="false" />
         <activity
-            android:name=".PubsMapActivity"
+            android:name=".views.PubsMapActivity"
             android:exported="false" />
         <activity
-            android:name=".MapPickerActivity"
+            android:name=".views.MapPickerActivity"
             android:exported="false" />
         <activity
-            android:name=".SplashActivity"
+            android:name=".views.SplashActivity"
             android:exported="true"
             android:theme="@style/Theme.PubsBarsFinder.Splash">
             <intent-filter>
@@ -33,10 +33,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".PubFormActivity"
+            android:name=".views.PubFormActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".views.MainActivity"
             android:exported="false" />
     </application>
 
